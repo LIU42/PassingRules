@@ -1,0 +1,5 @@
+train: ../train/images
+val: ../val/images
+
+nc: 3
+names: [ "red", "green", "yellow" ]
