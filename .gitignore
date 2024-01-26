@@ -160,7 +160,9 @@ cython_debug/
 #.idea/
 
 .vscode
-*.png
+*/datasets/*/*/*.png
+*/images/*.png
+*/results/*.png
 *.pt
 *.cache
 *.txt
