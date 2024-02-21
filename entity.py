@@ -1,14 +1,11 @@
-import torch
+import numpy
 import cv2
 import math
 
 class TrafficLight:
 
-    def __init__(self, xywh_tensor: torch.Tensor, color: str) -> None:
-        self.center_x = xywh_tensor[0].item()
-        self.center_y = xywh_tensor[1].item()
-        self.width = xywh_tensor[2].item()
-        self.height = xywh_tensor[3].item()
+    def __init__(self, rect_array: numpy.ndarray, color: str) -> None:
+        self.center_x, self.center_y, self.width, self.height = rect_array
         self.color = color
         self.shape = None
 
@@ -16,15 +13,7 @@ class TrafficLight:
         return f"{self.center_x} {self.center_y} {self.width} {self.height} {self.color} {self.shape}"
 
     def __eq__(self, other: 'TrafficLight') -> bool:
-        if self.center_x != other.center_x:
-            return False
-        if self.center_y != other.center_y:
-            return False
-        if self.width != other.width:
-            return False
-        if self.height != other.height:
-            return False
-        return True
+        return self.rect_xywh == other.rect_xywh
     
     def __hash__(self) -> int:
         return hash(self.center_x) + hash(self.center_y) + hash(self.width) + hash(self.height)
@@ -57,13 +46,8 @@ class TrafficLight:
     
     @staticmethod
     def center_distance(cluster: set['TrafficLight'], x: float = 320, y: float = 240) -> float:
-        average_center_x = 0
-        average_center_y = 0
-        for traffic_light in cluster:
-            average_center_x += traffic_light.center_x
-            average_center_y += traffic_light.center_y
-        average_center_x /= len(cluster)
-        average_center_y /= len(cluster)
+        average_center_x = numpy.mean([ traffic_light.center_x for traffic_light in cluster ])
+        average_center_y = numpy.mean([ traffic_light.center_y for traffic_light in cluster ])
         return math.sqrt((average_center_x - x) ** 2 + (average_center_y - y) ** 2)
     
     def plot(self, image: cv2.Mat) -> cv2.Mat:
@@ -105,8 +89,8 @@ class TrafficSignal:
         self.left = False
         self.right = True
 
-    def plot_signal(self, image: cv2.Mat, text: str, x: int, allow: bool) -> cv2.Mat:
-        return cv2.putText(image, text, (x, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0) if allow else (0, 0, 255), 2)
+    def plot_signal(self, image: cv2.Mat, text: str, offset_x: int, allow: bool) -> cv2.Mat:
+        return cv2.putText(image, text, (offset_x, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0) if allow else (0, 0, 255), 2)
     
     def plot(self, image: cv2.Mat) -> cv2.Mat:
         self.plot_signal(image, "Straight", 55, self.straight)

@@ -34,7 +34,7 @@ class Main:
             cv2.imshow(window_name, frame)
             print(f"\rFPS: {1 / (timeit.default_timer() - start_times):.2f}", end = "")      
         capture.release()
-        cv2.destroyAllWindows() 
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     Main().images_predict()

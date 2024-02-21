@@ -10,7 +10,7 @@ class TrafficLightCluster:
     def get_closest_indices(self, cluster_list: list[set[TrafficLight]]) -> tuple[int, int, float]:
         min_similarity = math.inf
         closest_index1 = 0
-        cloeset_index2 = 0
+        closest_index2 = 0
         for index1 in range(0, len(cluster_list) - 1):
             for index2 in range(index1 + 1, len(cluster_list)):
                 similarity = TrafficLight.similarity(cluster_list[index1], cluster_list[index2])
@@ -18,8 +18,8 @@ class TrafficLightCluster:
                     continue
                 min_similarity = similarity
                 closest_index1 = index1
-                cloeset_index2 = index2
-        return closest_index1, cloeset_index2, min_similarity
+                closest_index2 = index2
+        return closest_index1, closest_index2, min_similarity
     
     def get_closest_cluster(self, cluster_list: list[set[TrafficLight]]) -> set[TrafficLight]:
         if len(cluster_list) == 0:

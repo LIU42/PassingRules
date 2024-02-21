@@ -2,8 +2,8 @@ import cv2
 
 from entity import TrafficSignal
 from entity import TrafficLight
-from detect.predict import TrafficLightDetector
 from cluster import TrafficLightCluster
+from detect.predict import TrafficLightDetector
 from classify.predict import ShapeClassifier
 
 class TrafficSignalSolution:
