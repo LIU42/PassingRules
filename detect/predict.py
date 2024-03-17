@@ -14,7 +14,7 @@ class TrafficLightDetector:
 
     def detect(self, image: cv2.Mat) -> list[TrafficLight]:
         result = self.model(image, verbose = False)[0]
-        detected_list = []
+        detected_list = list[TrafficLight]()
         for index, classes_index in enumerate(result.boxes.cls.tolist(), start = 0):
             detected_list.append(TrafficLight(result.boxes.xywh[index].numpy(), result.names[classes_index]))
         return detected_list

@@ -23,7 +23,7 @@ class TrafficLightCluster:
     
     def get_closest_cluster(self, cluster_list: list[set[TrafficLight]]) -> set[TrafficLight]:
         if len(cluster_list) == 0:
-            return set()
+            return set[TrafficLight]()
         closest_distance = math.inf
         closest_index = 0
         for index, cluster in enumerate(cluster_list, start = 0):
@@ -35,7 +35,7 @@ class TrafficLightCluster:
         return cluster_list[closest_index]
 
     def cluster(self, detected_list: list[TrafficLight], similarity_threshold: float = 30) -> set[TrafficLight]:
-        cluster_list = list({traffic_light} for traffic_light in detected_list)
+        cluster_list = list[set[TrafficLight]]({traffic_light} for traffic_light in detected_list)
         while len(cluster_list) > 1:
             index1, index2, similarity = self.get_closest_indices(cluster_list)
             if similarity > similarity_threshold:
