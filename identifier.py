@@ -1,12 +1,13 @@
 import cv2
 
-from entity import TrafficSignal
-from entity import TrafficLight
-from cluster import TrafficLightCluster
+from entities import TrafficSignal
+from entities import TrafficLight
+
 from detect.predict import TrafficLightDetector
+from cluster import TrafficLightCluster
 from classify.predict import ShapeClassifier
 
-class TrafficSignalSolution:
+class TrafficSignalIdentifier:
 
     def __init__(self) -> None:
         self.detector = TrafficLightDetector()
@@ -25,7 +26,7 @@ class TrafficSignalSolution:
                 image = traffic_light.plot(image)
         return traffic_light_group
     
-    def parse_full_signal(self, traffic_light_group: set[TrafficLight]) -> tuple[bool, bool]:
+    def identify_full_signal(self, traffic_light_group: set[TrafficLight]) -> tuple[bool, bool]:
         have_green_full = False
         have_red_full = False
         for traffic_light in traffic_light_group:
@@ -37,7 +38,7 @@ class TrafficSignalSolution:
                 have_red_full = True
         return have_green_full, have_red_full
     
-    def parse_direct_signal(self, traffic_light_group: set[TrafficLight], traffic_signal: TrafficSignal) -> TrafficSignal:
+    def identify_direct_signal(self, traffic_light_group: set[TrafficLight], traffic_signal: TrafficSignal) -> TrafficSignal:
         for traffic_light in traffic_light_group:
             if traffic_light.shape == "full":
                 continue
@@ -60,11 +61,11 @@ class TrafficSignalSolution:
             traffic_signal.all_allow()
             return traffic_signal
         
-        have_green_full, have_red_full = self.parse_full_signal(traffic_light_group)
+        have_green_full, have_red_full = self.identify_full_signal(traffic_light_group)
         if have_green_full and not have_red_full:
             traffic_signal.all_allow()
 
-        traffic_signal = self.parse_direct_signal(traffic_light_group, traffic_signal)
+        traffic_signal = self.identify_direct_signal(traffic_light_group, traffic_signal)
         if plot_result:
             image = traffic_signal.plot(image)
         return traffic_signal
@@ -80,11 +81,11 @@ class TrafficSignalSolution:
             traffic_signal.all_allow()
             return traffic_signal
         
-        have_green_full, have_red_full = self.parse_full_signal(traffic_light_group)
+        have_green_full, have_red_full = self.identify_full_signal(traffic_light_group)
         if have_red_full and not have_green_full:
             traffic_signal.all_forbid()
             
-        traffic_signal = self.parse_direct_signal(traffic_light_group, traffic_signal)
+        traffic_signal = self.identify_direct_signal(traffic_light_group, traffic_signal)
         if plot_result:
             image = traffic_signal.plot(image)
         return traffic_signal

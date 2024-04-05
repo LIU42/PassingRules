@@ -1,6 +1,6 @@
 import math
 
-from entity import TrafficLight
+from entities import TrafficLight
 
 class TrafficLightCluster:
 

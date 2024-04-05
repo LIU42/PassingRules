@@ -4,10 +4,13 @@ import math
 
 class TrafficLight:
 
-    def __init__(self, rect_array: numpy.ndarray, color: str) -> None:
-        self.center_x, self.center_y, self.width, self.height = rect_array
+    def __init__(self, center_x: int, center_y: int, width: int, height: int, color: str, shape: str = None) -> None:
+        self.center_x = center_x
+        self.center_y = center_y
+        self.width = width
+        self.height = height
         self.color = color
-        self.shape = None
+        self.shape = shape
 
     def __str__(self) -> str:
         return f"{self.center_x} {self.center_y} {self.width} {self.height} {self.color} {self.shape}"
@@ -64,6 +67,13 @@ class TrafficLight:
         cv2.rectangle(image, (x1, y1), (x2, y2), mark_color)
         return image
     
+class TrafficLightBuilder:
+
+    @staticmethod
+    def from_xywh_array(xywh_array: numpy.ndarray, color: str) -> TrafficLight:
+        center_x, center_y, width, height = xywh_array
+        return TrafficLight(center_x, center_y, width, height, color)
+
 class TrafficSignal:
 
     def __init__(self, strategy: str = "conservative") -> None:

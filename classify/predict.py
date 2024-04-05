@@ -3,7 +3,7 @@ import os
 
 from ultralytics import YOLO
 from classify.utils import ClassifyUtils
-from entity import TrafficLight
+from entities import TrafficLight
 
 class ShapeClassifier:
 

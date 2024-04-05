@@ -2,7 +2,8 @@ import cv2
 import os
 
 from ultralytics import YOLO
-from entity import TrafficLight
+from entities import TrafficLightBuilder
+from entities import TrafficLight
 
 class TrafficLightDetector:
 
@@ -16,12 +17,13 @@ class TrafficLightDetector:
         result = self.model(image, verbose = False)[0]
         detected_list = list[TrafficLight]()
         for index, classes_index in enumerate(result.boxes.cls.tolist(), start = 0):
-            detected_list.append(TrafficLight(result.boxes.xywh[index].numpy(), result.names[classes_index]))
+            detected_list.append(TrafficLightBuilder.from_xywh_array(result.boxes.xywh[index].numpy(), result.names[classes_index]))
         return detected_list
     
     def test(self, image_path: str = "./detect/images", result_path: str = "./detect/results") -> None:
         for image_name in os.listdir(image_path):
-            result = self.model(cv2.imread(f"{image_path}/{image_name}"))[0]
+            image = cv2.imread(f"{image_path}/{image_name}")
+            result = self.model(image)[0]
             cv2.imwrite(f"{result_path}/result_{image_name}", result.plot())
 
 if __name__ == "__main__":
