@@ -19,9 +19,6 @@ class ShapeClassifier:
             result = self.model(ImageUtils.get_range(image, *traffic_light.rect_xyxy), imgsz = 64, verbose = False)[0]
             traffic_light.shape = result.names[result.probs.top1]
         return traffic_light_set
-    
-    def mark_result(self, image: cv2.Mat, label: str) -> cv2.Mat:
-        cv2.putText(image, label, (0, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255))
 
     def test(self, image_path: str = "./classify/images", result_path: str = "./classify/results") -> None:
         for image_name in os.listdir(image_path):
