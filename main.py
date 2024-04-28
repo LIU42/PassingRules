@@ -29,25 +29,6 @@ class MainProgram:
 
         print(f"\nAverage Times: {total_times / image_count:.3f}s\n")
 
-    def camera_predict(self, camera: int = 0, window_name: str = "Camera Predict") -> None:    
-        cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
-        capture = cv2.VideoCapture(camera)
-
-        while capture.isOpened():
-            if cv2.waitKey(delay = 1) == ord("q"):
-                break
-            start_times = time.perf_counter()
-            success, frame = capture.read()
-            if not success:
-                break
-            self.identifier(frame, plot_result = True)
-            end_times = time.perf_counter()
-
-            cv2.imshow(window_name, frame)
-            print(f"\rFPS: {1 / (end_times - start_times):.2f}", end = "")  
-
-        capture.release()
-        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     MainProgram().images_predict()

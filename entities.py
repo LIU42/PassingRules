@@ -1,6 +1,9 @@
 import numpy
+import torch
 import cv2
 import math
+
+from utils import PlottingUtils
 
 class TrafficLight:
 
@@ -23,15 +26,15 @@ class TrafficLight:
     
     @property
     def rect_xywh(self) -> tuple[int, int, int, int]:
-        return (int(self.center_x), int(self.center_y), int(self.width), int(self.height))
+        return int(self.center_x), int(self.center_y), int(self.width), int(self.height)
     
     @property
     def rect_xyxy(self) -> tuple[int, int, int, int]:
-        x1 = self.center_x - self.width / 2
-        y1 = self.center_y - self.height / 2
-        x2 = self.center_x + self.width / 2
-        y2 = self.center_y + self.height / 2
-        return (int(x1), int(y1), int(x2), int(y2))
+        x1 = self.center_x - self.width // 2
+        y1 = self.center_y - self.height // 2
+        x2 = self.center_x + self.width // 2
+        y2 = self.center_y + self.height // 2
+        return int(x1), int(y1), int(x2), int(y2)
     
     def similarity_to(self, other: 'TrafficLight', weight_x: float = 0.05, weight_y: float = 5, weight_size: float = 2) -> float:
         distance_x = weight_x * (self.center_x - other.center_x)
@@ -53,35 +56,35 @@ class TrafficLight:
         average_center_y = numpy.mean([ traffic_light.center_y for traffic_light in cluster ])
         return math.sqrt((average_center_x - x) ** 2 + (average_center_y - y) ** 2)
     
-    def plot(self, image: cv2.Mat) -> cv2.Mat:
-        x1, y1, x2, y2 = self.rect_xyxy
-        if self.color == "red":
-            mark_color = (0, 0, 255)
-        elif self.color == "green":
-            mark_color = (0, 255, 0)
-        elif self.color == "yellow":
-            mark_color = (0, 204, 255)
-        else:
-            mark_color = (127, 127, 127)
-        cv2.putText(image, self.shape, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.4, mark_color)
-        cv2.rectangle(image, (x1, y1), (x2, y2), mark_color)
-        return image
+    def set_radical(self) -> None:
+        if self.color != "red":
+            self.color = "green"
+
+    def set_conservative(self) -> None:
+        if self.color != "green":
+            self.color = "red"
     
+    def plot(self, image: cv2.Mat) -> cv2.Mat:
+        return PlottingUtils.plot_traffic_light(image, *self.rect_xyxy, self.color, self.shape)
+
+
 class TrafficLightBuilder:
 
     @staticmethod
-    def from_xywh_array(xywh_array: numpy.ndarray, color: str) -> TrafficLight:
-        center_x, center_y, width, height = xywh_array
-        return TrafficLight(center_x, center_y, width, height, color)
+    def from_xywh(xywh_tensor: torch.Tensor, color: str) -> TrafficLight:
+        center_x, center_y, width, height = xywh_tensor
+        return TrafficLight(int(center_x), int(center_y), int(width), int(height), color)
+
 
 class TrafficSignal:
 
     def __init__(self, strategy: str = "conservative") -> None:
+        assert strategy == "radical" or strategy == "conservative"
         if strategy == "radical":
             self.straight = True
             self.left = True
             self.right = True
-        else:
+        elif strategy == "conservative":
             self.straight = False
             self.left = False
             self.right = True
@@ -99,12 +102,9 @@ class TrafficSignal:
         self.left = False
         self.right = True
 
-    def plot_signal(self, image: cv2.Mat, text: str, offset_x: int, allow: bool) -> cv2.Mat:
-        return cv2.putText(image, text, (offset_x, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0) if allow else (0, 0, 255), 2)
-    
     def plot(self, image: cv2.Mat) -> cv2.Mat:
-        self.plot_signal(image, "Straight", 55, self.straight)
-        self.plot_signal(image, "Left", 5, self.left)
-        self.plot_signal(image, "Right", 145, self.right)
+        image = PlottingUtils.plot_signal(image, "Straight", 55, self.straight)
+        image = PlottingUtils.plot_signal(image, "Left", 5, self.left)
+        image = PlottingUtils.plot_signal(image, "Right", 145, self.right)
         return image
     

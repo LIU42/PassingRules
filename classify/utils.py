@@ -15,4 +15,5 @@ class ClassifyUtils:
         x = (new_size - image_resize.shape[1]) // 2
         y = (new_size - image_resize.shape[0]) // 2
         background[y:y + image_resize.shape[0], x:x + image_resize.shape[1]] = image_resize
+        
         return background
