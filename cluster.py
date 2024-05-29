@@ -41,12 +41,16 @@ class TrafficLightCluster:
 
         return cluster_list[closest_index]
 
-    def cluster(self, detected_list: list[TrafficLight], similarity_threshold: float = 30) -> set[TrafficLight]:
-        cluster_list = list(self.create_set(traffic_light) for traffic_light in detected_list)
+    def cluster(self, traffic_lights: list[TrafficLight], similarity_threshold: float = 30) -> set[TrafficLight]:
+        cluster_list = list()
+        for traffic_light in traffic_lights:
+            cluster_list.append(self.create_set(traffic_light))
+
         while len(cluster_list) > 1:
             index1, index2, similarity = self.get_closest_indices(cluster_list)
             if similarity > similarity_threshold:
                 break
             cluster_list[index1] = cluster_list[index1].union(cluster_list[index2])
             cluster_list.pop(index2)
+
         return self.get_closest_cluster(cluster_list)

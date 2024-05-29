@@ -163,7 +163,8 @@ cython_debug/
 */datasets/*/*/*.png
 */images/*.png
 */results/*.png
+*/runs/*
 *.pt
 *.cache
 *.txt
-best_openvino_model
+*/weights/*

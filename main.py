@@ -1,34 +1,28 @@
 import cv2
 import os
+import statistics
 import time
 
 from identifier import TrafficSignalIdentifier
 
-class MainProgram:
+def predict_images(identifier: TrafficSignalIdentifier, images_path: str = "./images", result_path: str = "./results") -> None:
+    cost_times = list()
+    for image_name in os.listdir(images_path):
+        image = cv2.imread(f"{images_path}/{image_name}")
 
-    def __init__(self) -> None:
-        self.identifier = TrafficSignalIdentifier()
+        entry_time = time.perf_counter()
+        signal = identifier(image)
+        leave_time = time.perf_counter()
 
-    def images_predict(self, image_path: str = "./images", result_path: str = "./results") -> None:
-        total_times = 0
-        image_count = 0
+        cost_time = leave_time - entry_time
+        cost_times.append(cost_time)
 
-        for image_index, image_name in enumerate(os.listdir(image_path), start = 0):
-            image = cv2.imread(f"{image_path}/{image_name}")
-            start_times = time.perf_counter()
-            signal = self.identifier(image, plot_result = True)
-            end_times = time.perf_counter()
-            delta_times = end_times - start_times
-            
-            if image_index > 0:
-                total_times += delta_times
-                image_count += 1
+        cv2.imwrite(f"{result_path}/result_{image_name}", image)
+        print(f"Image: {image_name:<10} {signal} Times: {cost_time:.3f}s")
 
-            cv2.imwrite(f"{result_path}/result_{image_name}", image)
-            print(f"Image: {image_name:<10}{signal}Times: {delta_times:.3f}s")
-
-        print(f"\nAverage Times: {total_times / image_count:.3f}s\n")
+    print(f"Average Times: {statistics.mean(sorted(cost_times)[1:-1]):.3f}s")
 
 
 if __name__ == "__main__":
-    MainProgram().images_predict()
+    identifier = TrafficSignalIdentifier()
+    predict_images(identifier)
