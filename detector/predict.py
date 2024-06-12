@@ -1,19 +1,40 @@
 import cv2
-from ultralytics import YOLO
 
-from entities import TrafficLight
+from structures import TrafficLight
+from utils import ImageUtils
+from utils import ResultUtils
+
 
 class TrafficLightDetector:
 
-    def __init__(self, model_path: str = "./detector/weights/detect_openvino_model") -> None:
-        self.model = YOLO(model_path, task="detect")
+    def __init__(self):
+        self.model = cv2.dnn.readNetFromONNX("./detector/weights/detect.onnx")
 
-    def __call__(self, image: cv2.Mat) -> list[TrafficLight]:
+    def __call__(self, image):
         return self.detect(image)
 
-    def detect(self, image: cv2.Mat) -> list[TrafficLight]:
-        result = self.model(image, verbose=False)[0].numpy()
-        detected_list = list()
-        for box_index, classes_index in enumerate(result.boxes.cls, start=0):
-            detected_list.append(TrafficLight(*result.boxes.xywh[box_index], result.names[classes_index]))
-        return detected_list
+    @staticmethod
+    def get_color(color_index):
+        if color_index == 0:
+            return "red"
+        if color_index == 1:
+            return "green"
+        if color_index == 2:
+            return "yellow"
+        return None
+
+    def detect(self, image):
+        inputs = ImageUtils.preprocess(image, size=640, padding_color=127)
+        self.model.setInput(inputs)
+
+        outputs = self.model.forward()
+        outputs = outputs.squeeze()
+        outputs = cv2.transpose(outputs)
+
+        boxes, classes = ResultUtils.non_max_suppression(outputs, conf_threshold=0.25, nms_threshold=0.45)
+        detections = list()
+
+        for box, color_index in zip(boxes, classes):
+            detections.append(TrafficLight(box[0], box[1] - 80, box[2], box[3], self.get_color(color_index)))
+
+        return detections

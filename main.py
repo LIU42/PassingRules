@@ -3,10 +3,12 @@ import os
 import statistics
 import time
 
-from identifier import TrafficSignalIdentifier
+from identify import TrafficSignalIdentifier
 
-def predict_images(identifier: TrafficSignalIdentifier, images_path: str = "./images", result_path: str = "./results") -> None:
-    cost_times = list()
+
+def predict_images(identifier, images_path, result_path):
+    exec_times = list()
+
     for image_name in os.listdir(images_path):
         image = cv2.imread(f"{images_path}/{image_name}")
 
@@ -14,15 +16,14 @@ def predict_images(identifier: TrafficSignalIdentifier, images_path: str = "./im
         signal = identifier(image)
         leave_time = time.perf_counter()
 
-        cost_time = leave_time - entry_time
-        cost_times.append(cost_time)
+        exec_time = leave_time - entry_time
+        exec_times.append(exec_time)
 
         cv2.imwrite(f"{result_path}/result_{image_name}", image)
-        print(f"Image: {image_name:<10} {signal} Times: {cost_time:.3f}s")
+        print(f"Image: {image_name:<10} {signal} Times: {exec_time:.3f}s")
 
-    print(f"Average Times: {statistics.mean(sorted(cost_times)[1:-1]):.3f}s")
+    print(f"Average Times: {statistics.mean(sorted(exec_times)[1:-1]):.3f}s")
 
 
 if __name__ == "__main__":
-    identifier = TrafficSignalIdentifier()
-    predict_images(identifier)
+    predict_images(TrafficSignalIdentifier(), images_path="./images", result_path="./results")
