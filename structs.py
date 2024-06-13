@@ -76,8 +76,6 @@ class TrafficSignal:
             self.left = False
             self.right = True
 
-        self.strategy = strategy
-
     def __str__(self):
         return f"Straight: {str(self.straight):<8} Left: {str(self.left):<8} Right: {str(self.right):<8}"
 

@@ -1,9 +1,6 @@
 import cv2
 import numpy as np
 
-from structures import TrafficLight
-from structures import TrafficSignal
-
 
 class PlottingUtils:
 
@@ -88,7 +85,7 @@ class ResultUtils:
         scores = list()
 
         for result in outputs:
-            min_score, max_score, min_location, max_location = cv2.minMaxLoc(result[4:])
+            _, max_score, _, max_location = cv2.minMaxLoc(result[4:])
 
             if max_score > conf_threshold:
                 boxes.append([
@@ -101,6 +98,7 @@ class ResultUtils:
                 classes.append(max_location[1])
 
         result_index = cv2.dnn.NMSBoxes(boxes, scores, conf_threshold, nms_threshold, eta=0.5)
+
         result_boxes = np.array(boxes, dtype=np.int32)[result_index]
         result_classes = np.array(classes, dtype=np.int32)[result_index]
 

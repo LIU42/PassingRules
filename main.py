@@ -1,29 +1,56 @@
+import argparse
 import cv2
 import os
 import statistics
 import time
 
-from identify import TrafficSignalIdentifier
+from predict import MainPredictor
 
 
-def predict_images(identifier, images_path, result_path):
-    exec_times = list()
+def predict_execute_wrapper(predictor, image):
+    start_time = time.perf_counter()
+    signal = predictor(image)
+    end_time = time.perf_counter()
+    return signal, (end_time - start_time)
 
-    for image_name in os.listdir(images_path):
-        image = cv2.imread(f"{images_path}/{image_name}")
 
-        entry_time = time.perf_counter()
-        signal = identifier(image)
-        leave_time = time.perf_counter()
+def predict_images(predictor, source_path, result_path):
+    execute_times = list()
 
-        exec_time = leave_time - entry_time
-        exec_times.append(exec_time)
+    for image_name in os.listdir(source_path):
+        image = cv2.imread(f"{source_path}/{image_name}")
+        signal, execute_time = predict_execute_wrapper(predictor, image)
 
         cv2.imwrite(f"{result_path}/result_{image_name}", image)
-        print(f"Image: {image_name:<10} {signal} Times: {exec_time:.3f}s")
+        execute_times.append(execute_time)
 
-    print(f"Average Times: {statistics.mean(sorted(exec_times)[1:-1]):.3f}s")
+        print(f"Image: {image_name:<10} {signal} Times: {execute_time:.3f}s")
+
+    print(f"Average Times: {statistics.mean(sorted(execute_times)[1:-1]):.3f}s")
 
 
 if __name__ == "__main__":
-    predict_images(TrafficSignalIdentifier(), images_path="./images", result_path="./results")
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--source_path", type=str, default="./images")
+    parser.add_argument("--result_path", type=str, default="./results")
+
+    parser.add_argument("--conf_threshold", type=float, default=0.25)
+    parser.add_argument("--nms_threshold", type=float, default=0.45)
+
+    parser.add_argument("--filter_weights", type=tuple, default=(0.05, 5, 2))
+    parser.add_argument("--filter_threshold", type=float, default=40)
+
+    parser.add_argument("--strategy", type=str, default="conservative", choices=["conservative", "radical"])
+    parser.add_argument("--plotting", type=bool, default=True)
+
+    arguments = parser.parse_args()
+    predictor = MainPredictor(
+        conf_threshold=arguments.conf_threshold,
+        nms_threshold=arguments.nms_threshold,
+        filter_threshold=arguments.filter_threshold,
+        filter_weights=arguments.filter_weights,
+        strategy=arguments.strategy,
+        plotting=arguments.plotting,
+    )
+    predict_images(predictor, arguments.source_path, arguments.result_path)

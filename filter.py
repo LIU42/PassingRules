@@ -1,20 +1,17 @@
 import math
 import statistics
 
-from structures import TrafficLight
 
+class MainFilter:
 
-class TrafficLightFilter:
+    def __init__(self, weights=(0.05, 5, 2), threshold=40):
+        self.weight_x = weights[0]
+        self.weight_y = weights[1]
+        self.weight_size = weights[2]
+        self.threshold = threshold
 
-    def __init__(self, center=(320, 240), weight=(0.05, 5, 2)):
-        self.center_x = center[0]
-        self.center_y = center[1]
-        self.weight_x = weight[0]
-        self.weight_y = weight[1]
-        self.weight_size = weight[2]
-
-    def __call__(self, detections, threshold=40):
-        return self.do_filter(detections, threshold)
+    def __call__(self, detections):
+        return self.filter(detections)
 
     def similarity_to(self, light1, light2):
         distance_x = (light1.center_x - light2.center_x) * self.weight_x
@@ -27,11 +24,12 @@ class TrafficLightFilter:
     def create_set(*lights):
         return set(lights)
 
-    def center_distance(self, lights):
+    @staticmethod
+    def center_distance(lights):
         average_x = statistics.mean(light.center_x for light in lights)
         average_y = statistics.mean(light.center_y for light in lights)
 
-        return math.sqrt((average_x - self.center_x) ** 2 + (average_y - self.center_y) ** 2)
+        return math.sqrt((average_x - 320) ** 2 + (average_y - 240) ** 2)
 
     def similarity(self, cluster1, cluster2):
         min_distance = math.inf
@@ -71,12 +69,12 @@ class TrafficLightFilter:
 
         return cluster_list[closest_index]
 
-    def do_filter(self, detected_list, threshold):
+    def filter(self, detected_list):
         cluster_list = list(map(self.create_set, detected_list))
 
         while len(cluster_list) > 1:
             index1, index2, similarity = self.get_closest_indices(cluster_list)
-            if similarity > threshold:
+            if similarity > self.threshold:
                 break
             cluster_list[index1] = cluster_list[index1].union(cluster_list[index2])
             cluster_list.pop(index2)

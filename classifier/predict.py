@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
 
-from structures import TrafficLight
 from utils import ImageUtils
 
 
-class ShapeClassifier:
+class MainClassifier:
 
     def __init__(self):
         self.model = cv2.dnn.readNetFromONNX("./classifier/weights/classify.onnx")

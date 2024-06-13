@@ -1,13 +1,15 @@
 import cv2
 
-from structures import TrafficLight
+from structs import TrafficLight
 from utils import ImageUtils
 from utils import ResultUtils
 
 
-class TrafficLightDetector:
+class MainDetector:
 
-    def __init__(self):
+    def __init__(self, conf_threshold=0.25, nms_threshold=0.45):
+        self.conf_threshold = conf_threshold
+        self.nms_threshold = nms_threshold
         self.model = cv2.dnn.readNetFromONNX("./detector/weights/detect.onnx")
 
     def __call__(self, image):
@@ -31,7 +33,7 @@ class TrafficLightDetector:
         outputs = outputs.squeeze()
         outputs = cv2.transpose(outputs)
 
-        boxes, classes = ResultUtils.non_max_suppression(outputs, conf_threshold=0.25, nms_threshold=0.45)
+        boxes, classes = ResultUtils.non_max_suppression(outputs, self.conf_threshold, self.nms_threshold)
         detections = list()
 
         for box, color_index in zip(boxes, classes):
