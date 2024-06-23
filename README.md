@@ -1,16 +1,16 @@
-# Traffic Signal
+# Passing Rules
 
 **一种基于 YOLOv8 的路口交通信号灯通行规则识别模型及算法**
 
 
 
-#### 模型简介
+#### 项目简介
 
-该模型自上而下共分为以下四个步骤：
+在本项目中，通行规则识别自上而下共分为以下四个步骤：
 
 1. **目标检测**，采用 YOLOv8 目标检测模型，识别图像中交通信号灯的位置及颜色。
 
-2. **过滤筛选**，对检测出的交通信号灯采用改进的层次聚类算法进行聚类，以加权的欧氏距离和尺寸差值作为相似度度量，以一定的相似度阈值作为停止条件，筛选出最有可能表示当前通行规则的信号灯组。
+2. **过滤筛选**，对检测出的交通信号灯采用改进的层次聚类算法进行聚类，以加权的欧氏距离和尺寸差值作为相似度度量，以一定的相似度阈值作为停止条件，从而筛选出最有可能表示当前通行规则的信号灯组。
 
 3. **信号分类**，对当前交通信号灯组中的所有信号灯，分别采用 YOLOv8 图像分类模型，将其表示的信号分为直行（Straight）、左转（Left）、右转（Right）和全部（Full）四类。
 
@@ -41,13 +41,13 @@
 
 同时在当前数据集下信号分类准确率接近 100%，模型的整体准确率暂未量化评估。
 
-*<u>注：本项目主要用于学习和可行性研究，训练用的数据集规模较小，在真实工况下的鲁棒性可能不够理想。</u>*
+*<u>注：本项目主要用于学习和可行性研究，训练用的数据集规模较小，在真实环境下的鲁棒性可能不够理想。</u>*
 
 
 
 #### 使用说明
 
-首先安装环境依赖包，项目采用 OpenCV DNN 模块部署，运行仅需要依赖 OpenCV - Python 和 NumPy 软件包。
+首先安装环境依赖包，项目采用 OpenCV DNN 模块部署，运行时仅需要依赖 OpenCV-Python 和 NumPy 软件包。
 
 ```bash
 pip install -r requirements.txt
@@ -63,13 +63,13 @@ python main.py
 
 | 参数名                | 描述                                              | 数据类型                  | 默认值            |
 | ------------------ | ----------------------------------------------- | --------------------- | -------------- |
-| --source_path      | 待识别图像路径                                         | str                   | "./images"     |
-| --result_path      | 输出结果路径                                          | str                   | "./results"    |
+| --source_path      | 待识别图像路径                                         | str                   | './images'     |
+| --result_path      | 输出结果路径                                          | str                   | './results'    |
 | --conf_threshold   | 交通信号灯目标检测置信度阈值                                  | float                 | 0.25           |
 | --nms_threshold    | 交通信号灯目标检测非极大值抑制阈值                               | float                 | 0.45           |
 | --filter_weights   | 过滤器聚类权重系数，为一个三元组，依次为 x 轴权重、y 轴权重和尺寸权重           | (float, float, float) | (0.05, 5, 2)   |
 | --filter_threshold | 过滤器聚类停止阈值                                       | float                 | 40             |
-| --strategy         | 通行规则识别策略，"conservative"（保守策略） 或 "radical"（激进策略） | str                   | "conservative" |
+| --strategy         | 通行规则识别策略，'conservative'（保守策略） 或 'radical'（激进策略） | str                   | 'conservative' |
 | --plotting         | 是否绘制识别结果到图像                                     | bool                  | True           |
 
 如果需要使用自己的数据集训练模型，则需要安装 ultralytics 框架，参照 <u>detector/datasets</u> 和 <u>classifier/datasets</u> 中数据集的结构配置以及 [Ultralytics 官方文档](https://docs.ultralytics.com/) 进行模型的训练，最后将模型转换为 ONNX 格式进行部署即可。

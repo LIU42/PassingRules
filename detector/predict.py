@@ -1,11 +1,11 @@
 import cv2
 
-from structs import TrafficLight
+from structs import TrafficSignal
 from utils import ImageUtils
 from utils import ResultUtils
 
 
-class MainDetector:
+class SignalDetector:
 
     def __init__(self, conf_threshold=0.25, nms_threshold=0.45):
         self.conf_threshold = conf_threshold
@@ -37,6 +37,6 @@ class MainDetector:
         detections = list()
 
         for box, color_index in zip(boxes, classes):
-            detections.append(TrafficLight(box[0], box[1] - 80, box[2], box[3], self.get_color(color_index)))
+            detections.append(TrafficSignal(box[0], box[1] - 80, box[2], box[3], self.get_color(color_index)))
 
         return detections

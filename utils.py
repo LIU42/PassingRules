@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 
 class PlottingUtils:
@@ -15,39 +16,39 @@ class PlottingUtils:
         return 127, 127, 127
 
     @staticmethod
-    def plot_traffic_light(image, light):
-        color = PlottingUtils.get_color(light.color)
+    def plot_traffic_signal(image, signal):
+        color = PlottingUtils.get_color(signal.color)
 
-        x1 = light.x1
-        y1 = light.y1
-        x2 = light.x2
-        y2 = light.y2
+        x1 = signal.x1
+        y1 = signal.y1
+        x2 = signal.x2
+        y2 = signal.y2
 
-        image = cv2.putText(image, light.shape, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color)
+        image = cv2.putText(image, signal.shape, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color)
         image = cv2.rectangle(image, (x1, y1), (x2, y2), color)
 
         return image
 
     @staticmethod
-    def plot_traffic_lights(image, lights):
-        for light in lights:
-            image = PlottingUtils.plot_traffic_light(image, light)
+    def plot_traffic_signals(image, signals):
+        for signal in signals:
+            image = PlottingUtils.plot_traffic_signal(image, signal)
         return image
 
     @staticmethod
-    def plot_signal(image, text, offset, allow):
+    def plot_direct_rule(image, direct, offset, allow):
         if allow:
             color = PlottingUtils.get_color('green')
         else:
             color = PlottingUtils.get_color('red')
 
-        return cv2.putText(image, text, (offset, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+        return cv2.putText(image, direct, (offset, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
     @staticmethod
-    def plot_traffic_signal(image, signal):
-        image = PlottingUtils.plot_signal(image, 'Left', 5, signal.left)
-        image = PlottingUtils.plot_signal(image, 'Straight', 55, signal.straight)
-        image = PlottingUtils.plot_signal(image, 'Right', 145, signal.right)
+    def plot_passing_rules(image, rules):
+        image = PlottingUtils.plot_direct_rule(image, 'Left', 5, rules.left)
+        image = PlottingUtils.plot_direct_rule(image, 'Straight', 55, rules.straight)
+        image = PlottingUtils.plot_direct_rule(image, 'Right', 145, rules.right)
         return image
 
 
@@ -103,3 +104,14 @@ class ResultUtils:
         result_classes = np.array(classes, dtype=np.int32)[result_index]
 
         return result_boxes, result_classes
+
+
+class TimingUtils:
+
+    @staticmethod
+    def execute_time(function, *args, **kwargs):
+        time_tick1 = time.perf_counter()
+        result = function(*args, **kwargs)
+        time_tick2 = time.perf_counter()
+        return result, (time_tick2 - time_tick1)
+

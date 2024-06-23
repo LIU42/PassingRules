@@ -4,13 +4,13 @@ import numpy as np
 from utils import ImageUtils
 
 
-class MainClassifier:
+class ShapeClassifier:
 
     def __init__(self):
         self.model = cv2.dnn.readNetFromONNX('./classifier/weights/classify.onnx')
 
-    def __call__(self, image, lights):
-        return self.classify(image, lights)
+    def __call__(self, image, signals):
+        return self.classify(image, signals)
 
     @staticmethod
     def get_shape(shape_index):
@@ -24,12 +24,12 @@ class MainClassifier:
             return 'straight'
         return None
 
-    def classify(self, image, lights):
-        for light in lights:
-            x1 = light.x1
-            y1 = light.y1
-            x2 = light.x2
-            y2 = light.y2
+    def classify(self, image, signals):
+        for signal in signals:
+            x1 = signal.x1
+            y1 = signal.y1
+            x2 = signal.x2
+            y2 = signal.y2
 
             inputs = ImageUtils.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0)
             self.model.setInput(inputs)
@@ -38,6 +38,6 @@ class MainClassifier:
             outputs = outputs.squeeze()
 
             shape_index = np.argmax(outputs)
-            light.shape = self.get_shape(shape_index)
+            signal.shape = self.get_shape(shape_index)
 
-        return lights
+        return signals

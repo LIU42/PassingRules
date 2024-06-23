@@ -1,7 +1,7 @@
 from functools import cache
 
 
-class TrafficLight:
+class TrafficSignal:
 
     def __init__(self, x, y, width, height, color, shape=None):
         self.x = x
@@ -15,7 +15,7 @@ class TrafficLight:
         return f'Box: [{self.x}, {self.y}, {self.width}, {self.height}] Color: {self.color} Shape: {self.shape}'
 
     def __eq__(self, value):
-        if not isinstance(value, TrafficLight):
+        if not isinstance(value, TrafficSignal):
             return False
         if self.x != value.x:
             return False
@@ -61,7 +61,7 @@ class TrafficLight:
         return int(self.y + self.height)
 
 
-class TrafficSignal:
+class PassingRules:
 
     def __init__(self, strategy='conservative'):
         assert strategy == 'radical' or strategy == 'conservative'

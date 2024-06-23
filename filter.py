@@ -2,7 +2,7 @@ import math
 import statistics
 
 
-class MainFilter:
+class SignalFilter:
 
     def __init__(self, weights=(0.05, 5, 2), threshold=40):
         self.weight_x = weights[0]
@@ -13,29 +13,29 @@ class MainFilter:
     def __call__(self, detections):
         return self.filter(detections)
 
-    def similarity_to(self, light1, light2):
-        distance_x = (light1.center_x - light2.center_x) * self.weight_x
-        distance_y = (light1.center_y - light2.center_y) * self.weight_y
+    def similarity_to(self, signal1, signal2):
+        distance_x = (signal1.center_x - signal2.center_x) * self.weight_x
+        distance_y = (signal1.center_y - signal2.center_y) * self.weight_y
 
-        size_similarity = (abs(light1.width - light2.width) + abs(light1.height - light2.height)) * self.weight_size
+        size_similarity = (abs(signal1.width - signal2.width) + abs(signal1.height - signal2.height)) * self.weight_size
         return math.sqrt(distance_x ** 2 + distance_y ** 2) + size_similarity
 
     @staticmethod
-    def create_set(*lights):
-        return set(lights)
+    def create_set(*signals):
+        return set(signals)
 
     @staticmethod
-    def center_distance(lights):
-        average_x = statistics.mean(light.center_x for light in lights)
-        average_y = statistics.mean(light.center_y for light in lights)
+    def center_distance(signals):
+        average_x = statistics.mean(signal.center_x for signal in signals)
+        average_y = statistics.mean(signal.center_y for signal in signals)
 
         return math.sqrt((average_x - 320) ** 2 + (average_y - 240) ** 2)
 
     def similarity(self, cluster1, cluster2):
         min_distance = math.inf
-        for light1 in cluster1:
-            for light2 in cluster2:
-                min_distance = min(self.similarity_to(light1, light2), min_distance)
+        for signal1 in cluster1:
+            for signal2 in cluster2:
+                min_distance = min(self.similarity_to(signal1, signal2), min_distance)
         return min_distance
 
     def get_closest_indices(self, cluster_list):
@@ -69,8 +69,8 @@ class MainFilter:
 
         return cluster_list[closest_index]
 
-    def filter(self, detected_list):
-        cluster_list = list(map(self.create_set, detected_list))
+    def filter(self, detections):
+        cluster_list = list(map(self.create_set, detections))
 
         while len(cluster_list) > 1:
             index1, index2, similarity = self.get_closest_indices(cluster_list)

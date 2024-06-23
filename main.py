@@ -2,29 +2,22 @@ import argparse
 import cv2
 import os
 import statistics
-import time
 
-from predict import MainPredictor
-
-
-def predict_execute_wrapper(predictor, image):
-    start_time = time.perf_counter()
-    signal = predictor(image)
-    end_time = time.perf_counter()
-    return signal, (end_time - start_time)
+from recognition import RulesRecognizer
+from utils import TimingUtils
 
 
-def predict_images(predictor, source_path, result_path):
+def recognize_images(recognizer, source_path, result_path):
     execute_times = list()
 
     for image_name in os.listdir(source_path):
         image = cv2.imread(f'{source_path}/{image_name}')
-        signal, execute_time = predict_execute_wrapper(predictor, image)
+        rules, execute_time = TimingUtils.execute_time(recognizer, image)
 
         cv2.imwrite(f'{result_path}/result_{image_name}', image)
         execute_times.append(execute_time)
 
-        print(f'Image: {image_name:<10} {signal} Times: {execute_time:.3f}s')
+        print(f'Image: {image_name:<10} {rules} Times: {execute_time:.3f}s')
 
     print(f'Average Times: {statistics.mean(sorted(execute_times)[1:-1]):.3f}s')
 
@@ -45,7 +38,7 @@ def main():
     parser.add_argument('--plotting', type=bool, default=True)
 
     arguments = parser.parse_args()
-    predictor = MainPredictor(
+    recognizer = RulesRecognizer(
         conf_threshold=arguments.conf_threshold,
         nms_threshold=arguments.nms_threshold,
         filter_threshold=arguments.filter_threshold,
@@ -53,7 +46,7 @@ def main():
         strategy=arguments.strategy,
         plotting=arguments.plotting,
     )
-    predict_images(predictor, arguments.source_path, arguments.result_path)
+    recognize_images(recognizer, arguments.source_path, arguments.result_path)
 
 
 if __name__ == '__main__':
