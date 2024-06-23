@@ -7,7 +7,7 @@ from utils import ImageUtils
 class MainClassifier:
 
     def __init__(self):
-        self.model = cv2.dnn.readNetFromONNX("./classifier/weights/classify.onnx")
+        self.model = cv2.dnn.readNetFromONNX('./classifier/weights/classify.onnx')
 
     def __call__(self, image, lights):
         return self.classify(image, lights)
@@ -15,13 +15,13 @@ class MainClassifier:
     @staticmethod
     def get_shape(shape_index):
         if shape_index == 0:
-            return "full"
+            return 'full'
         if shape_index == 1:
-            return "left"
+            return 'left'
         if shape_index == 2:
-            return "right"
+            return 'right'
         if shape_index == 3:
-            return "straight"
+            return 'straight'
         return None
 
     def classify(self, image, lights):

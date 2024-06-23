@@ -18,31 +18,31 @@ def predict_images(predictor, source_path, result_path):
     execute_times = list()
 
     for image_name in os.listdir(source_path):
-        image = cv2.imread(f"{source_path}/{image_name}")
+        image = cv2.imread(f'{source_path}/{image_name}')
         signal, execute_time = predict_execute_wrapper(predictor, image)
 
-        cv2.imwrite(f"{result_path}/result_{image_name}", image)
+        cv2.imwrite(f'{result_path}/result_{image_name}', image)
         execute_times.append(execute_time)
 
-        print(f"Image: {image_name:<10} {signal} Times: {execute_time:.3f}s")
+        print(f'Image: {image_name:<10} {signal} Times: {execute_time:.3f}s')
 
-    print(f"Average Times: {statistics.mean(sorted(execute_times)[1:-1]):.3f}s")
+    print(f'Average Times: {statistics.mean(sorted(execute_times)[1:-1]):.3f}s')
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--source_path", type=str, default="./images")
-    parser.add_argument("--result_path", type=str, default="./results")
+    parser.add_argument('--source_path', type=str, default='./images')
+    parser.add_argument('--result_path', type=str, default='./results')
 
-    parser.add_argument("--conf_threshold", type=float, default=0.25)
-    parser.add_argument("--nms_threshold", type=float, default=0.45)
+    parser.add_argument('--conf_threshold', type=float, default=0.25)
+    parser.add_argument('--nms_threshold', type=float, default=0.45)
 
-    parser.add_argument("--filter_weights", type=tuple, default=(0.05, 5, 2))
-    parser.add_argument("--filter_threshold", type=float, default=40)
+    parser.add_argument('--filter_weights', type=tuple, default=(0.05, 5, 2))
+    parser.add_argument('--filter_threshold', type=float, default=40)
 
-    parser.add_argument("--strategy", type=str, default="conservative", choices=["conservative", "radical"])
-    parser.add_argument("--plotting", type=bool, default=True)
+    parser.add_argument('--strategy', type=str, default='conservative', choices=['conservative', 'radical'])
+    parser.add_argument('--plotting', type=bool, default=True)
 
     arguments = parser.parse_args()
     predictor = MainPredictor(
@@ -54,3 +54,7 @@ if __name__ == "__main__":
         plotting=arguments.plotting,
     )
     predict_images(predictor, arguments.source_path, arguments.result_path)
+
+
+if __name__ == '__main__':
+    main()

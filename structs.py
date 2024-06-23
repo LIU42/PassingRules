@@ -12,7 +12,7 @@ class TrafficLight:
         self.shape = shape
 
     def __str__(self):
-        return f"Box: [{self.x}, {self.y}, {self.width}, {self.height}] Color: {self.color} Shape: {self.shape}"
+        return f'Box: [{self.x}, {self.y}, {self.width}, {self.height}] Color: {self.color} Shape: {self.shape}'
 
     def __eq__(self, value):
         if not isinstance(value, TrafficLight):
@@ -63,21 +63,21 @@ class TrafficLight:
 
 class TrafficSignal:
 
-    def __init__(self, strategy="conservative"):
-        assert strategy == "radical" or strategy == "conservative"
+    def __init__(self, strategy='conservative'):
+        assert strategy == 'radical' or strategy == 'conservative'
 
-        if strategy == "radical":
+        if strategy == 'radical':
             self.straight = True
             self.left = True
             self.right = True
 
-        elif strategy == "conservative":
+        elif strategy == 'conservative':
             self.straight = False
             self.left = False
             self.right = True
 
     def __str__(self):
-        return f"Straight: {str(self.straight):<8} Left: {str(self.left):<8} Right: {str(self.right):<8}"
+        return f'Straight: {str(self.straight):<8} Left: {str(self.left):<8} Right: {str(self.right):<8}'
 
     def allow_all(self):
         self.straight = True

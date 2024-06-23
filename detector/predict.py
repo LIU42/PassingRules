@@ -10,7 +10,7 @@ class MainDetector:
     def __init__(self, conf_threshold=0.25, nms_threshold=0.45):
         self.conf_threshold = conf_threshold
         self.nms_threshold = nms_threshold
-        self.model = cv2.dnn.readNetFromONNX("./detector/weights/detect.onnx")
+        self.model = cv2.dnn.readNetFromONNX('./detector/weights/detect.onnx')
 
     def __call__(self, image):
         return self.detect(image)
@@ -18,11 +18,11 @@ class MainDetector:
     @staticmethod
     def get_color(color_index):
         if color_index == 0:
-            return "red"
+            return 'red'
         if color_index == 1:
-            return "green"
+            return 'green'
         if color_index == 2:
-            return "yellow"
+            return 'yellow'
         return None
 
     def detect(self, image):

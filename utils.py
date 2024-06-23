@@ -6,11 +6,11 @@ class PlottingUtils:
 
     @staticmethod
     def get_color(color_name):
-        if color_name == "red":
+        if color_name == 'red':
             return 0, 0, 255
-        if color_name == "green":
+        if color_name == 'green':
             return 0, 255, 0
-        if color_name == "yellow":
+        if color_name == 'yellow':
             return 0, 204, 255
         return 127, 127, 127
 
@@ -37,17 +37,17 @@ class PlottingUtils:
     @staticmethod
     def plot_signal(image, text, offset, allow):
         if allow:
-            color = PlottingUtils.get_color("green")
+            color = PlottingUtils.get_color('green')
         else:
-            color = PlottingUtils.get_color("red")
+            color = PlottingUtils.get_color('red')
 
         return cv2.putText(image, text, (offset, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
     @staticmethod
     def plot_traffic_signal(image, signal):
-        image = PlottingUtils.plot_signal(image, "Left", 5, signal.left)
-        image = PlottingUtils.plot_signal(image, "Straight", 55, signal.straight)
-        image = PlottingUtils.plot_signal(image, "Right", 145, signal.right)
+        image = PlottingUtils.plot_signal(image, 'Left', 5, signal.left)
+        image = PlottingUtils.plot_signal(image, 'Straight', 55, signal.straight)
+        image = PlottingUtils.plot_signal(image, 'Right', 145, signal.right)
         return image
 
 
