@@ -32,7 +32,7 @@ class RulesRecognizer:
     def get_passable_judge(self):
         if self.strategy == 'conservative':
             return lambda color: color == 'green'
-        if self.strategy == 'radical':
+        else:
             return lambda color: color != 'red'
         
     def create_passing_rules(self):

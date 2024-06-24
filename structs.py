@@ -70,8 +70,7 @@ class PassingRules:
             self.straight = True
             self.left = True
             self.right = True
-
-        elif strategy == 'conservative':
+        else:
             self.straight = False
             self.left = False
             self.right = True

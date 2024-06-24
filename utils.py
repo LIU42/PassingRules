@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 import time
 
 
@@ -76,6 +77,15 @@ class ImageUtils:
     def preprocess(image, size, padding_color):
         return ImageUtils.blob(ImageUtils.letterbox(image, size=size, padding_color=padding_color), size=size)
 
+    @staticmethod
+    def iter_images(source_path):
+        for image_name in os.listdir(source_path):
+            yield image_name, cv2.imread(f'{source_path}/{image_name}')
+
+    @staticmethod
+    def save_image(image, image_name, result_path):
+        cv2.imwrite(f'{result_path}/result_{image_name}', image)
+
 
 class ResultUtils:
 
@@ -114,4 +124,3 @@ class TimingUtils:
         result = function(*args, **kwargs)
         time_tick2 = time.perf_counter()
         return result, (time_tick2 - time_tick1)
-

@@ -1,21 +1,18 @@
 import argparse
-import cv2
-import os
 import statistics
 
 from recognition import RulesRecognizer
+from utils import ImageUtils
 from utils import TimingUtils
 
 
 def recognize_images(recognizer, source_path, result_path):
     execute_times = list()
 
-    for image_name in os.listdir(source_path):
-        image = cv2.imread(f'{source_path}/{image_name}')
+    for image_name, image in ImageUtils.iter_images(source_path):
         rules, execute_time = TimingUtils.execute_time(recognizer, image)
-
-        cv2.imwrite(f'{result_path}/result_{image_name}', image)
         execute_times.append(execute_time)
+        ImageUtils.save_image(image, image_name, result_path)
 
         print(f'Image: {image_name:<10} {rules} Times: {execute_time:.3f}s')
 
