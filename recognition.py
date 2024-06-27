@@ -14,13 +14,18 @@ class RulesRecognizer:
 
         self.detector = SignalDetector(
             conf_threshold=arguments['conf_threshold'],
-            nms_threshold=arguments['nms_threshold'],
+            iou_threshold=arguments['iou_threshold'],
+            device=arguments['device'],
+            precision=arguments['precision'],
         )
         self.filter = SignalFilter(
-            threshold=arguments['filter_threshold'],
             weights=arguments['filter_weights'],
+            threshold=arguments['filter_threshold'],
         )
-        self.classifier = ShapeClassifier()
+        self.classifier = ShapeClassifier(
+            device=arguments['device'],
+            precision=arguments['precision'],
+        )
         self.is_passable = self.get_passable_judge()
 
     def __call__(self, image):

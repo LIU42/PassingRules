@@ -47,9 +47,9 @@ class PlottingUtils:
 
     @staticmethod
     def plot_passing_rules(image, rules):
-        image = PlottingUtils.plot_direct_rule(image, 'Left', 5, rules.left)
-        image = PlottingUtils.plot_direct_rule(image, 'Straight', 55, rules.straight)
-        image = PlottingUtils.plot_direct_rule(image, 'Right', 145, rules.right)
+        image = PlottingUtils.plot_direct_rule(image, 'LEFT', 5, rules.left)
+        image = PlottingUtils.plot_direct_rule(image, 'STRAIGHT', 65, rules.straight)
+        image = PlottingUtils.plot_direct_rule(image, 'RIGHT', 165, rules.right)
         return image
 
 
@@ -58,6 +58,7 @@ class ImageUtils:
     @staticmethod
     def letterbox(image, size, padding_color):
         current_size = max(image.shape[0], image.shape[1])
+
         x1 = (current_size - image.shape[1]) // 2
         y1 = (current_size - image.shape[0]) // 2
 
@@ -70,12 +71,19 @@ class ImageUtils:
         return cv2.resize(background, (size, size))
 
     @staticmethod
-    def blob(image, size):
-        return cv2.dnn.blobFromImage(image, scalefactor=(1 / 255), size=(size, size), swapRB=True)
+    def convert_inputs(image, precision):
+        inputs = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).transpose((2, 0, 1))
+        inputs = inputs / 255.0
+        inputs = np.expand_dims(inputs, axis=0)
+
+        if precision == 'fp16':
+            return inputs.astype(np.float16)
+        else:
+            return inputs.astype(np.float32)
 
     @staticmethod
-    def preprocess(image, size, padding_color):
-        return ImageUtils.blob(ImageUtils.letterbox(image, size=size, padding_color=padding_color), size=size)
+    def preprocess(image, size, padding_color, precision):
+        return ImageUtils.convert_inputs(ImageUtils.letterbox(image, size=size, padding_color=padding_color), precision)
 
     @staticmethod
     def iter_images(source_path):
@@ -90,12 +98,12 @@ class ImageUtils:
 class ResultUtils:
 
     @staticmethod
-    def non_max_suppression(outputs, conf_threshold, nms_threshold):
+    def non_max_suppression(outputs, conf_threshold, iou_threshold):
         classes = list()
         boxes = list()
         scores = list()
 
-        for result in outputs:
+        for result in outputs.astype(np.float32):
             _, max_score, _, max_location = cv2.minMaxLoc(result[4:])
 
             if max_score > conf_threshold:
@@ -108,12 +116,13 @@ class ResultUtils:
                 scores.append(max_score)
                 classes.append(max_location[1])
 
-        result_index = cv2.dnn.NMSBoxes(boxes, scores, conf_threshold, nms_threshold, eta=0.5)
+        result_indices = cv2.dnn.NMSBoxes(boxes, scores, conf_threshold, iou_threshold, eta=0.5)
 
-        result_boxes = np.array(boxes, dtype=np.int32)[result_index]
-        result_classes = np.array(classes, dtype=np.int32)[result_index]
+        boxes = np.asarray(boxes, dtype=np.int32)
+        classes = np.asarray(classes, dtype=np.int32)
 
-        return result_boxes, result_classes
+        for index in result_indices:
+            yield boxes[index], classes[index]
 
 
 class TimingUtils:

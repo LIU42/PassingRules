@@ -1,4 +1,4 @@
-import cv2
+import onnxruntime as ort
 
 from structs import TrafficSignal
 from utils import ImageUtils
@@ -7,10 +7,17 @@ from utils import ResultUtils
 
 class SignalDetector:
 
-    def __init__(self, conf_threshold=0.25, nms_threshold=0.45):
+    def __init__(self, device='CPU', precision='fp32', conf_threshold=0.25, iou_threshold=0.45):
+        self.precision = precision
         self.conf_threshold = conf_threshold
-        self.nms_threshold = nms_threshold
-        self.model = cv2.dnn.readNetFromONNX('./detector/weights/detect.onnx')
+        self.iou_threshold = iou_threshold
+
+        if device == 'GPU':
+            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        else:
+            providers = ['CPUExecutionProvider']
+
+        self.session = ort.InferenceSession(f'./detector/weights/signal-detect-{precision}.onnx', providers=providers)
 
     def __call__(self, image):
         return self.detect(image)
@@ -26,17 +33,18 @@ class SignalDetector:
         return None
 
     def detect(self, image):
-        inputs = ImageUtils.preprocess(image, size=640, padding_color=127)
-        self.model.setInput(inputs)
+        inputs = ImageUtils.preprocess(image, size=640, padding_color=127, precision=self.precision)
 
-        outputs = self.model.forward()
-        outputs = outputs.squeeze()
-        outputs = cv2.transpose(outputs)
+        outputs = self.session.run(None, {
+            'images': inputs,
+        })
+        outputs = outputs[0].squeeze()
+        outputs = outputs.transpose()
 
-        boxes, classes = ResultUtils.non_max_suppression(outputs, self.conf_threshold, self.nms_threshold)
+        results = ResultUtils.non_max_suppression(outputs, self.conf_threshold, self.iou_threshold)
         detections = list()
 
-        for box, color_index in zip(boxes, classes):
-            detections.append(TrafficSignal(box[0], box[1] - 80, box[2], box[3], self.get_color(color_index)))
+        for (x, y, width, height), color_index in results:
+            detections.append(TrafficSignal(x, y - 80, width, height, self.get_color(color_index)))
 
         return detections

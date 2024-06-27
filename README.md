@@ -12,7 +12,7 @@
 
 2. **过滤筛选**，对检测出的交通信号灯采用改进的层次聚类算法进行聚类，以加权的欧氏距离和尺寸差值作为相似度度量，以一定的相似度阈值作为停止条件，从而筛选出最有可能表示当前通行规则的信号灯组。
 
-3. **信号分类**，对当前交通信号灯组中的所有信号灯，分别采用 YOLOv8 图像分类模型，将其表示的信号分为直行（Straight）、左转（Left）、右转（Right）和全部（Full）四类。
+3. **信号分类**，对当前交通信号灯组中的所有信号灯，分别采用 YOLOv8 图像分类模型，将其表示的信号分为直行（straight）、左转（left）、右转（right）和全部（full）四类。
 
 4. **规则解析**，对分类后的交通信号灯组，解析其表示的通行规则（即能否直行、能否左转和能否右转），有两种可选的解析策略：  
    
@@ -31,9 +31,9 @@
 
 #### 性能评估
 
-在 640x480 的图像输入下，采用 PyTorch 和 ONNX 平均推理一张图片的耗时约为 90ms，改用 OpenVino 推理平均耗时约为 54ms （CPU：11th Intel Core i5-1155G7 2.50GHz，Model：YOLOv8n）。
+在 640x480 的图像输入下，采用 PyTorch 平均推理一张图片的耗时约为 120ms，采用 ONNX Runtime 推理平均耗时约为 60ms，采用 OpenVino 推理平均耗时约为 54ms （CPU：11th Intel Core i5-1155G7 2.50GHz，Model：YOLOv8n）。
 
-在当前数据集下目标检测：
+在当前数据集下信号灯目标检测指标：
 
 | P     | R     | mAP50 | mAP50-95 |
 | ----- | ----- | ----- | -------- |
@@ -47,13 +47,19 @@
 
 #### 使用说明
 
-首先安装环境依赖包，项目采用 OpenCV DNN 模块部署，运行时仅需要依赖 OpenCV-Python 和 NumPy 软件包。
+首先安装环境依赖包，项目目前采用 ONNX Runtime 部署模型。
 
 ```bash
 pip install -r requirements.txt
 ```
 
-分别准备好用于存放待识别图像和输出结果两个空目录，将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，运行 main.py 即可。
+运行以上命令将会安装 OpenCV-Python、NumPy 和 ONNX Runtime 的依赖，若需要使用 GPU 进行推理，则需要安装：
+
+```
+pip install onnxruntime-gpu
+```
+
+分别准备好用于存放待识别图像和输出结果两个空目录，将所有待识别的图像放入待识别图像目录下，也可使用默认的目录，要求图像尺寸为 640x480，运行 main.py 即可。
 
 ```bash
 python main.py
@@ -66,9 +72,11 @@ python main.py
 | --source_path      | 待识别图像路径                                         | str                   | './images'     |
 | --result_path      | 输出结果路径                                          | str                   | './results'    |
 | --conf_threshold   | 交通信号灯目标检测置信度阈值                                  | float                 | 0.25           |
-| --nms_threshold    | 交通信号灯目标检测非极大值抑制阈值                               | float                 | 0.45           |
+| --iou_threshold    | 交通信号灯目标检测非极大值抑制 IoU 阈值                          | float                 | 0.45           |
 | --filter_weights   | 过滤器聚类权重系数，为一个三元组，依次为 x 轴权重、y 轴权重和尺寸权重           | (float, float, float) | (0.05, 5, 2)   |
 | --filter_threshold | 过滤器聚类停止阈值                                       | float                 | 40             |
+| --device           | 推理设备，'CPU' 或 'GPU'                              | str                   | 'CPU'          |
+| --precision        | 推理运算精度，'fp32'（单精度）或 'fp16'（半精度）                 | str                   | 'fp32'         |
 | --strategy         | 通行规则识别策略，'conservative'（保守策略） 或 'radical'（激进策略） | str                   | 'conservative' |
 | --plotting         | 是否绘制识别结果到图像                                     | bool                  | True           |
 
@@ -77,5 +85,3 @@ python main.py
 ```bash
 pip install ultralytics
 ```
-
-

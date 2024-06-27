@@ -25,8 +25,11 @@ def main():
     parser.add_argument('--source_path', type=str, default='./images')
     parser.add_argument('--result_path', type=str, default='./results')
 
+    parser.add_argument('--device', type=str, default='CPU', choices=['CPU', 'GPU'])
+    parser.add_argument('--precision', type=str, default='fp32', choices=['fp32', 'fp16'])
+
     parser.add_argument('--conf_threshold', type=float, default=0.25)
-    parser.add_argument('--nms_threshold', type=float, default=0.45)
+    parser.add_argument('--iou_threshold', type=float, default=0.45)
 
     parser.add_argument('--filter_weights', type=tuple, default=(0.05, 5, 2))
     parser.add_argument('--filter_threshold', type=float, default=40)
@@ -34,16 +37,18 @@ def main():
     parser.add_argument('--strategy', type=str, default='conservative', choices=['conservative', 'radical'])
     parser.add_argument('--plotting', type=bool, default=True)
 
-    arguments = parser.parse_args()
+    args = parser.parse_args()
     recognizer = RulesRecognizer(
-        conf_threshold=arguments.conf_threshold,
-        nms_threshold=arguments.nms_threshold,
-        filter_threshold=arguments.filter_threshold,
-        filter_weights=arguments.filter_weights,
-        strategy=arguments.strategy,
-        plotting=arguments.plotting,
+        conf_threshold=args.conf_threshold,
+        iou_threshold=args.iou_threshold,
+        device=args.device,
+        precision=args.precision,
+        filter_threshold=args.filter_threshold,
+        filter_weights=args.filter_weights,
+        strategy=args.strategy,
+        plotting=args.plotting,
     )
-    recognize_images(recognizer, arguments.source_path, arguments.result_path)
+    recognize_images(recognizer, args.source_path, args.result_path)
 
 
 if __name__ == '__main__':

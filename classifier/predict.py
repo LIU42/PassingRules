@@ -1,13 +1,19 @@
-import cv2
 import numpy as np
+import onnxruntime as ort
 
 from utils import ImageUtils
 
 
 class ShapeClassifier:
 
-    def __init__(self):
-        self.model = cv2.dnn.readNetFromONNX('./classifier/weights/classify.onnx')
+    def __init__(self, device='CPU', precision='fp32'):
+        if device == 'GPU':
+            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        else:
+            providers = ['CPUExecutionProvider']
+
+        self.session = ort.InferenceSession(f'./classifier/weights/shape-classify-{precision}.onnx', providers=providers)
+        self.precision = precision
 
     def __call__(self, image, signals):
         return self.classify(image, signals)
@@ -31,13 +37,14 @@ class ShapeClassifier:
             x2 = signal.x2
             y2 = signal.y2
 
-            inputs = ImageUtils.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0)
-            self.model.setInput(inputs)
+            inputs = ImageUtils.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0, precision=self.precision)
 
-            outputs = self.model.forward()
-            outputs = outputs.squeeze()
+            outputs = self.session.run(None, {
+                'images': inputs,
+            })
+            outputs = outputs[0].squeeze()
+            outputs = np.argmax(outputs)
 
-            shape_index = np.argmax(outputs)
-            signal.shape = self.get_shape(shape_index)
+            signal.shape = self.get_shape(outputs)
 
         return signals
