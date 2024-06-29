@@ -22,8 +22,8 @@ def recognize_images(recognizer, source_path, result_path):
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--source_path', type=str, default='./images')
-    parser.add_argument('--result_path', type=str, default='./results')
+    parser.add_argument('--source_path', type=str, default='images')
+    parser.add_argument('--result_path', type=str, default='results')
 
     parser.add_argument('--device', type=str, default='CPU', choices=['CPU', 'GPU'])
     parser.add_argument('--precision', type=str, default='fp32', choices=['fp32', 'fp16'])
@@ -43,10 +43,10 @@ def main():
         iou_threshold=args.iou_threshold,
         device=args.device,
         precision=args.precision,
-        filter_threshold=args.filter_threshold,
-        filter_weights=args.filter_weights,
         strategy=args.strategy,
         plotting=args.plotting,
+        filter_threshold=args.filter_threshold,
+        filter_weights=args.filter_weights,
     )
     recognize_images(recognizer, args.source_path, args.result_path)
 

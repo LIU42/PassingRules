@@ -12,7 +12,7 @@ class ShapeClassifier:
         else:
             providers = ['CPUExecutionProvider']
 
-        self.session = ort.InferenceSession(f'./classifier/weights/shape-classify-{precision}.onnx', providers=providers)
+        self.session = ort.InferenceSession(f'classifier/weights/shape-classify-{precision}.onnx', providers=providers)
         self.precision = precision
 
     def __call__(self, image, signals):

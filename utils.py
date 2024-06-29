@@ -83,7 +83,7 @@ class ImageUtils:
 
     @staticmethod
     def preprocess(image, size, padding_color, precision):
-        return ImageUtils.convert_inputs(ImageUtils.letterbox(image, size=size, padding_color=padding_color), precision)
+        return ImageUtils.convert_inputs(ImageUtils.letterbox(image, size, padding_color), precision)
 
     @staticmethod
     def iter_images(source_path):

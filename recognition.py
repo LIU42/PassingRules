@@ -13,18 +13,18 @@ class RulesRecognizer:
         self.plotting = arguments['plotting']
 
         self.detector = SignalDetector(
-            conf_threshold=arguments['conf_threshold'],
-            iou_threshold=arguments['iou_threshold'],
-            device=arguments['device'],
-            precision=arguments['precision'],
+            arguments['device'],
+            arguments['precision'],
+            arguments['conf_threshold'],
+            arguments['iou_threshold'],
         )
         self.filter = SignalFilter(
-            weights=arguments['filter_weights'],
-            threshold=arguments['filter_threshold'],
+            arguments['filter_weights'],
+            arguments['filter_threshold'],
         )
         self.classifier = ShapeClassifier(
-            device=arguments['device'],
-            precision=arguments['precision'],
+            arguments['device'],
+            arguments['precision'],
         )
         self.is_passable = self.get_passable_judge()
 

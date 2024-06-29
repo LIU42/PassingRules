@@ -17,7 +17,7 @@ class SignalDetector:
         else:
             providers = ['CPUExecutionProvider']
 
-        self.session = ort.InferenceSession(f'./detector/weights/signal-detect-{precision}.onnx', providers=providers)
+        self.session = ort.InferenceSession(f'detector/weights/signal-detect-{precision}.onnx', providers=providers)
 
     def __call__(self, image):
         return self.detect(image)
