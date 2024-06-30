@@ -31,7 +31,7 @@
 
 #### 性能评估
 
-在 640x480 的图像输入下，采用 PyTorch 平均推理一张图片的耗时约为 120ms，采用 ONNX Runtime 推理平均耗时约为 60ms，采用 OpenVino 推理平均耗时约为 54ms （CPU：11th Intel Core i5-1155G7 2.50GHz，Model：YOLOv8n）。
+在 640x480 的图像输入下，采用 PyTorch 平均推理一张图片的耗时约为 120ms，采用 ONNX Runtime 推理平均耗时约为 50ms（CPU：11th Intel Core i5-1155G7 2.50GHz，Model：YOLOv8n）。
 
 在当前数据集下信号灯目标检测指标：
 
@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
 运行以上命令将会安装 OpenCV-Python、NumPy 和 ONNX Runtime 的依赖，若需要使用 GPU 进行推理，则需要安装：
 
-```
+```bash
 pip install onnxruntime-gpu
 ```
 
@@ -67,18 +67,18 @@ python main.py
 
 主程序 main.py 支持的命令行参数：
 
-| 参数名                | 描述                                              | 数据类型                  | 默认值                                   |
-| ------------------ | ----------------------------------------------- | --------------------- | ------------------------------------- |
-| --source_path      | 待识别图像路径                                         | str                   | 'images'                              |
-| --result_path      | 输出结果路径                                          | str                   | 'results' |
-| --conf_threshold   | 交通信号灯目标检测置信度阈值                                  | float                 | 0.25                                  |
-| --iou_threshold    | 交通信号灯目标检测非极大值抑制 IoU 阈值                          | float                 | 0.45                                  |
-| --filter_weights   | 过滤器聚类权重系数，为一个三元组，依次为 x 轴权重、y 轴权重和尺寸权重           | (float, float, float) | (0.05, 5, 2)                          |
-| --filter_threshold | 过滤器聚类停止阈值                                       | float                 | 40                                    |
-| --device           | 推理设备，'CPU' 或 'GPU'                              | str                   | 'CPU'                                 |
-| --precision        | 推理运算精度，'fp32'（单精度）或 'fp16'（半精度）                 | str                   | 'fp32'                                |
-| --strategy         | 通行规则识别策略，'conservative'（保守策略） 或 'radical'（激进策略） | str                   | 'conservative'                        |
-| --plotting         | 是否绘制识别结果到图像                                     | bool                  | True                                  |
+| 参数名                | 描述                                              | 数据类型                  | 默认值            |
+| ------------------ | ----------------------------------------------- | --------------------- | -------------- |
+| --source_path      | 待识别图像路径                                         | str                   | 'images'       |
+| --result_path      | 输出结果路径                                          | str                   | 'results'      |
+| --conf_threshold   | 交通信号灯目标检测置信度阈值                                  | float                 | 0.25           |
+| --iou_threshold    | 交通信号灯目标检测非极大值抑制 IoU 阈值                          | float                 | 0.45           |
+| --filter_weights   | 过滤器聚类权重系数，为一个三元组，依次为 x 轴权重、y 轴权重和尺寸权重           | (float, float, float) | (0.05, 5, 2)   |
+| --filter_threshold | 过滤器聚类停止阈值                                       | float                 | 40             |
+| --device           | 推理设备，'CPU' 或 'GPU'                              | str                   | 'CPU'          |
+| --precision        | 推理运算精度，'fp32'（单精度）或 'fp16'（半精度）                 | str                   | 'fp32'         |
+| --strategy         | 通行规则识别策略，'conservative'（保守策略） 或 'radical'（激进策略） | str                   | 'conservative' |
+| --plotting         | 是否绘制识别结果到图像                                     | bool                  | True           |
 
 如果需要使用自己的数据集训练模型，则需要安装 ultralytics 框架，参照 <u>detector/datasets</u> 和 <u>classifier/datasets</u> 中数据集的结构配置以及 [Ultralytics 官方文档](https://docs.ultralytics.com/) 进行模型的训练，最后将模型转换为 ONNX 格式进行部署即可。
 

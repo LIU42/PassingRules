@@ -59,8 +59,8 @@ class ImageUtils:
     def letterbox(image, size, padding_color):
         current_size = max(image.shape[0], image.shape[1])
 
-        x1 = (current_size - image.shape[1]) // 2
-        y1 = (current_size - image.shape[0]) // 2
+        x1 = (current_size - image.shape[1]) >> 1
+        y1 = (current_size - image.shape[0]) >> 1
 
         x2 = x1 + image.shape[1]
         y2 = y1 + image.shape[0]
@@ -98,30 +98,25 @@ class ImageUtils:
 class ResultUtils:
 
     @staticmethod
+    def get_valid_outputs(outputs, conf_threshold):
+        valid_outputs = outputs[np.amax(outputs[:, 4:7], axis=1) > conf_threshold]
+
+        boxes = valid_outputs[:, 0:4]
+        confidences = valid_outputs[:, 4:7]
+
+        return boxes.astype(np.int32), confidences
+
+    @staticmethod
     def non_max_suppression(outputs, conf_threshold, iou_threshold):
-        classes = list()
-        boxes = list()
-        scores = list()
+        boxes, confidences = ResultUtils.get_valid_outputs(outputs, conf_threshold)
 
-        for result in outputs.astype(np.float32):
-            _, max_score, _, max_location = cv2.minMaxLoc(result[4:])
+        scores = np.amax(confidences, axis=1)
+        classes = np.argmax(confidences, axis=1)
 
-            if max_score > conf_threshold:
-                boxes.append([
-                    result[0] - result[2] * 0.5,
-                    result[1] - result[3] * 0.5,
-                    result[2],
-                    result[3],
-                ])
-                scores.append(max_score)
-                classes.append(max_location[1])
+        boxes[:, 0] -= boxes[:, 2] >> 1
+        boxes[:, 1] -= boxes[:, 3] >> 1
 
-        result_indices = cv2.dnn.NMSBoxes(boxes, scores, conf_threshold, iou_threshold, eta=0.5)
-
-        boxes = np.asarray(boxes, dtype=np.int32)
-        classes = np.asarray(classes, dtype=np.int32)
-
-        for index in result_indices:
+        for index in cv2.dnn.NMSBoxes(boxes, scores, conf_threshold, iou_threshold, eta=0.5):
             yield boxes[index], classes[index]
 
 
