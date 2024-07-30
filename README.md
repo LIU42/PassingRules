@@ -51,7 +51,7 @@ pip install -r requirements.txt
 pip install onnxruntime-gpu
 ```
 
-将所有待识别的图像放入待识别图像目录下（<u>images/</u>），要求图像尺寸为 640x480，运行 main.py 即可。
+将所有待识别的图像放入待识别图像目录下（<u>images/</u>），要求图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到项目根目录合并，运行 main.py 即可。
 
 ```bash
 python main.py
@@ -68,7 +68,7 @@ detector:
   iou-threshold: 0.45    # 交通信号灯目标检测非极大值抑制 IoU 阈值
 
 filter:
-  weights: [0.05, 5, 2, 2]    # 过滤器相似度权重系数，为一个三元组，依次为 x 轴权重、y 轴权重、宽度权重和高度权重
+  weights: [0.05, 5, 2, 2]    # 过滤器相似度权重系数，为一个四元组，依次为 x 轴权重、y 轴权重、宽度权重和高度权重
   threshold: 40               # 过滤器 DBSCAN 聚类距离半径阈值
 
 strategy: "conservative"    # 通行规则识别策略，“conservative”（保守策略） 或 “radical”（激进策略）
@@ -79,5 +79,3 @@ strategy: "conservative"    # 通行规则识别策略，“conservative”（�
 ```bash
 pip install ultralytics
 ```
-
-
