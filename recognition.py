@@ -1,91 +1,67 @@
-from classifier.predict import ShapeClassifier
-from detector.predict import SignalDetector
-
+from detector import SignalDetector
 from filter import SignalFilter
-from structs import PassingRules
-from utils import PlottingUtils
+from classifier import ShapeClassifier
+from structs import DirectsBuilder
 
 
 class RulesRecognizer:
 
-    def __init__(self, **arguments):
-        self.strategy = arguments['strategy']
-        self.plotting = arguments['plotting']
+    def __init__(self, config):
+        self.strategy = config['strategy']
 
         self.detector = SignalDetector(
-            arguments['device'],
-            arguments['precision'],
-            arguments['conf_threshold'],
-            arguments['iou_threshold'],
+            config['device'],
+            config['precision'],
+            config['detector']['conf-threshold'],
+            config['detector']['iou-threshold'],
         )
         self.filter = SignalFilter(
-            arguments['filter_weights'],
-            arguments['filter_threshold'],
+            config['filter']['weights'],
+            config['filter']['threshold'],
         )
         self.classifier = ShapeClassifier(
-            arguments['device'],
-            arguments['precision'],
+            config['device'],
+            config['precision'],
         )
-        self.is_passable = self.get_passable_judge()
+        if self.strategy == 'radical':
+            self.is_passable = lambda signal: signal.color != 'red'
+        else:
+            self.is_passable = lambda signal: signal.color == 'green'
 
     def __call__(self, image):
-        return self.recognize(image)
+        detections = self.detector(image)
 
-    def detect_traffic_signals(self, image):
-        return self.classifier(image, self.filter(self.detector(image)))
-    
-    def get_passable_judge(self):
-        if self.strategy == 'conservative':
-            return lambda color: color == 'green'
-        else:
-            return lambda color: color != 'red'
-        
-    def create_passing_rules(self):
-        return PassingRules(self.strategy)
+        if len(detections) == 0:
+            return [], DirectsBuilder.allow()
 
-    def recognize_global_rules(self, signals, rules):
-        global_allow = False
-        global_forbid = False
+        signals = self.filter(detections)
+        signals = self.classifier(image, signals)
 
-        for signal in signals:
-            if signal.shape != 'full':
-                continue
-            if self.is_passable(signal.color):
-                global_allow = True
+        return signals, self.recognize(signals)
+
+    def global_recognize(self, signals):
+        if self.strategy == 'radical':
+            if any(signal.shape == 'full' and not self.is_passable(signal) for signal in signals):
+                return DirectsBuilder.prohibit()
             else:
-                global_forbid = True
-
-        if self.strategy == 'conservative' and global_allow and not global_forbid:
-            rules.allow_all()
-        elif self.strategy == 'radical' and global_forbid and not global_allow:
-            rules.forbid_all()
-
-        return rules
-
-    def recognize_direct_rules(self, signals, rules):
-        for signal in signals:
-            if signal.shape == 'full':
-                continue
-            elif signal.shape == 'straight':
-                rules.straight = self.is_passable(signal.color)
-            elif signal.shape == 'left':
-                rules.left = self.is_passable(signal.color)
-            elif signal.shape == 'right':
-                rules.right = self.is_passable(signal.color)
-        return rules
-
-    def recognize(self, image):
-        signals = self.detect_traffic_signals(image)
-        rules = self.create_passing_rules()
-
-        if len(signals) > 0:
-            rules = self.recognize_global_rules(signals, rules)
-            rules = self.recognize_direct_rules(signals, rules)
-
-            if self.plotting:
-                PlottingUtils.plot_traffic_signals(image, signals)
-                PlottingUtils.plot_passing_rules(image, rules)
+                return DirectsBuilder.allow()
         else:
-            rules.allow_all()
+            if any(signal.shape == 'full' and self.is_passable(signal) for signal in signals):
+                return DirectsBuilder.allow()
+            else:
+                return DirectsBuilder.prohibit()
 
-        return rules
+    def recognize(self, signals):
+        passing_directs = self.global_recognize(signals)
+
+        for signal in filter(lambda signal: signal.shape != 'full', signals):
+            if signal.shape == 'straight':
+                passing_directs.straight = self.is_passable(signal)
+
+            elif signal.shape == 'left':
+                passing_directs.left = self.is_passable(signal)
+
+            elif signal.shape == 'right':
+                passing_directs.right = self.is_passable(signal)
+
+        return passing_directs

@@ -6,31 +6,16 @@ from utils import ImageUtils
 
 class ShapeClassifier:
 
-    def __init__(self, device='CPU', precision='fp32'):
+    def __init__(self, device, precision):
         if device == 'GPU':
             providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
         else:
             providers = ['CPUExecutionProvider']
 
-        self.session = ort.InferenceSession(f'classifier/weights/shape-classify-{precision}.onnx', providers=providers)
+        self.session = ort.InferenceSession(f'classifier/weights/deploy/classify-{precision}.onnx', providers=providers)
         self.precision = precision
 
     def __call__(self, image, signals):
-        return self.classify(image, signals)
-
-    @staticmethod
-    def get_shape(shape_index):
-        if shape_index == 0:
-            return 'full'
-        if shape_index == 1:
-            return 'left'
-        if shape_index == 2:
-            return 'right'
-        if shape_index == 3:
-            return 'straight'
-        return None
-
-    def classify(self, image, signals):
         for signal in signals:
             x1 = signal.x1
             y1 = signal.y1
@@ -42,9 +27,6 @@ class ShapeClassifier:
             outputs = self.session.run(None, {
                 'images': inputs,
             })
-            outputs = outputs[0].squeeze()
-            outputs = np.argmax(outputs)
-
-            signal.shape = self.get_shape(outputs)
+            signal.shape_index = np.argmax(outputs[0].squeeze())
 
         return signals

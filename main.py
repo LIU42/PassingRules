@@ -1,54 +1,57 @@
-import argparse
+import cv2
+import os
 import statistics
+import time
+import yaml
 
 from recognition import RulesRecognizer
-from utils import ImageUtils
-from utils import TimingUtils
+from utils import MarkingUtils
 
 
-def recognize_images(recognizer, source_path, result_path):
-    execute_times = list()
+def load_recognizer():
+    with open('config.yaml', 'r') as configs:
+        return RulesRecognizer(yaml.load(configs, yaml.SafeLoader))
 
-    for image_name, image in ImageUtils.iter_images(source_path):
-        rules, execute_time = TimingUtils.execute_time(recognizer, image)
-        execute_times.append(execute_time)
-        ImageUtils.save_image(image, image_name, result_path)
 
-        print(f'Image: {image_name:<10} {rules} Times: {execute_time:.3f}s')
+def load_sources():
+    for image_name in os.listdir('images'):
+        yield image_name, cv2.imread(f'images/{image_name}')
 
-    print(f'Average Times: {statistics.mean(sorted(execute_times)[1:-1]):.3f}s')
+
+def save_result(image, image_name, results):
+    signals, directs = results
+
+    MarkingUtils.signals(image, signals)
+    MarkingUtils.directs(image, directs)
+
+    cv2.imwrite(f'results/result_{image_name}', image)
+
+
+def execute_recognition(recognizer, image):
+    counter1 = time.perf_counter()
+    results = recognizer(image)
+    counter2 = time.perf_counter()
+
+    return results, counter2 - counter1
+
+
+def average_time(execution_times):
+    return statistics.mean(sorted(execution_times)[1:-1])
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    recognizer = load_recognizer()
+    execution_times = []
 
-    parser.add_argument('--source_path', type=str, default='images')
-    parser.add_argument('--result_path', type=str, default='results')
+    for image_name, image in load_sources():
+        results, execution_time = execute_recognition(recognizer, image)
 
-    parser.add_argument('--device', type=str, default='CPU', choices=['CPU', 'GPU'])
-    parser.add_argument('--precision', type=str, default='fp32', choices=['fp32', 'fp16'])
+        execution_times.append(execution_time)
+        save_result(image, image_name, results)
 
-    parser.add_argument('--conf_threshold', type=float, default=0.25)
-    parser.add_argument('--iou_threshold', type=float, default=0.45)
+        print(f'image: {image_name:<8} time: {execution_time:.3f}s')
 
-    parser.add_argument('--filter_weights', type=tuple, default=(0.05, 5, 2))
-    parser.add_argument('--filter_threshold', type=float, default=40)
-
-    parser.add_argument('--strategy', type=str, default='conservative', choices=['conservative', 'radical'])
-    parser.add_argument('--plotting', type=bool, default=True)
-
-    args = parser.parse_args()
-    recognizer = RulesRecognizer(
-        conf_threshold=args.conf_threshold,
-        iou_threshold=args.iou_threshold,
-        device=args.device,
-        precision=args.precision,
-        strategy=args.strategy,
-        plotting=args.plotting,
-        filter_threshold=args.filter_threshold,
-        filter_weights=args.filter_weights,
-    )
-    recognize_images(recognizer, args.source_path, args.result_path)
+    print(f'average time: {average_time(execution_times):.3f}s')
 
 
 if __name__ == '__main__':

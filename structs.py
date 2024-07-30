@@ -1,89 +1,86 @@
-from functools import cache
-
-
 class TrafficSignal:
 
-    def __init__(self, x, y, width, height, color, shape=None):
+    def __init__(self, x, y, w, h, color_index, shape_index):
         self.x = x
         self.y = y
-        self.width = width
-        self.height = height
-        self.color = color
-        self.shape = shape
+        self.w = w
+        self.h = h
+        self.color_index = color_index
+        self.shape_index = shape_index
 
     def __str__(self):
-        return f'Box: [{self.x}, {self.y}, {self.width}, {self.height}] Color: {self.color} Shape: {self.shape}'
-
-    def __eq__(self, value):
-        if not isinstance(value, TrafficSignal):
-            return False
-        if self.x != value.x:
-            return False
-        if self.y != value.y:
-            return False
-        if self.width != value.width:
-            return False
-        if self.height != value.height:
-            return False
-        return True
-
-    def __hash__(self):
-        return hash(self.x) + hash(self.y) + hash(self.width) + hash(self.height)
+        return f'box: [{self.x}, {self.y}, {self.w}, {self.h}] color: {self.color} shape: {self.shape}'
 
     @property
-    @cache
+    def color(self):
+        if self.color_index == 0:
+            return 'red'
+        if self.color_index == 1:
+            return 'green'
+        if self.color_index == 2:
+            return 'yellow'
+
+    @property
+    def shape(self):
+        if self.shape_index == 0:
+            return 'full'
+        if self.shape_index == 1:
+            return 'left'
+        if self.shape_index == 2:
+            return 'right'
+        if self.shape_index == 3:
+            return 'straight'
+
+    @property
     def center_x(self):
-        return int(self.x + self.width * 0.5)
+        return self.x + (self.w >> 1)
 
     @property
-    @cache
     def center_y(self):
-        return int(self.y + self.height * 0.5)
+        return self.y + (self.h >> 1)
 
     @property
-    @cache
     def x1(self):
-        return int(self.x)
+        return self.x
 
     @property
-    @cache
     def y1(self):
-        return int(self.y)
+        return self.y
 
     @property
-    @cache
     def x2(self):
-        return int(self.x + self.width)
+        return self.x + self.w
 
     @property
-    @cache
     def y2(self):
-        return int(self.y + self.height)
+        return self.y + self.h
 
 
-class PassingRules:
+class SignalBuilder:
 
-    def __init__(self, strategy='conservative'):
-        assert strategy == 'radical' or strategy == 'conservative'
+    @staticmethod
+    def box(box, color_index):
+        x, y, w, h = box
+        return TrafficSignal(x, y - 80, w, h, color_index, None)
 
-        if strategy == 'radical':
-            self.straight = True
-            self.left = True
-            self.right = True
-        else:
-            self.straight = False
-            self.left = False
-            self.right = True
+
+class PassingDirects:
+
+    def __init__(self, left, right, straight):
+        self.left = left
+        self.right = right
+        self.straight = straight
 
     def __str__(self):
-        return f'Straight: {str(self.straight):<8} Left: {str(self.left):<8} Right: {str(self.right):<8}'
+        return f'left: {self.left} straight: {self.straight} right: {self.right}'
 
-    def allow_all(self):
-        self.straight = True
-        self.left = True
-        self.right = True
 
-    def forbid_all(self):
-        self.straight = False
-        self.left = False
-        self.right = True
+class DirectsBuilder:
+
+    @staticmethod
+    def allow():
+        return PassingDirects(True, True, True)
+
+    @staticmethod
+    def prohibit():
+        return PassingDirects(False, True, False)
