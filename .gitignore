@@ -163,4 +163,5 @@ cython_debug/
 */datasets/*
 */images/*
 */runs/*
-*/weights/*
+*/weights/develop/*
+*/weights/product/*

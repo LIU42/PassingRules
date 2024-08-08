@@ -1,7 +1,7 @@
 from detector import SignalDetector
 from filter import SignalFilter
 from classifier import ShapeClassifier
-from structs import DirectsBuilder
+from wrappers import DirectsBuilder
 
 
 class RulesRecognizer:

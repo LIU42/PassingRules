@@ -1,6 +1,6 @@
 import onnxruntime as ort
 
-from structs import SignalBuilder
+from wrappers import SignalBuilder
 from utils import ImageUtils
 from utils import ResultUtils
 
@@ -17,7 +17,7 @@ class SignalDetector:
         else:
             providers = ['CPUExecutionProvider']
 
-        self.session = ort.InferenceSession(f'detector/weights/deploy/detect-{precision}.onnx', providers=providers)
+        self.session = ort.InferenceSession(f'detector/weights/product/detect-{precision}.onnx', providers=providers)
 
     def __call__(self, image):
         inputs = ImageUtils.preprocess(image, size=640, padding_color=127, precision=self.precision)
