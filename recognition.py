@@ -1,28 +1,17 @@
+from classifier import ShapeClassifier
 from detector import SignalDetector
 from filter import SignalFilter
-from classifier import ShapeClassifier
 from wrappers import DirectsBuilder
 
 
 class RulesRecognizer:
 
-    def __init__(self, config):
-        self.strategy = config['strategy']
+    def __init__(self, configs):
+        self.configs = configs
+        self.detector = SignalDetector(configs)
+        self.filter = SignalFilter(configs)
+        self.classifier = ShapeClassifier(configs)
 
-        self.detector = SignalDetector(
-            config['device'],
-            config['precision'],
-            config['detector']['conf-threshold'],
-            config['detector']['iou-threshold'],
-        )
-        self.filter = SignalFilter(
-            config['filter']['weights'],
-            config['filter']['threshold'],
-        )
-        self.classifier = ShapeClassifier(
-            config['device'],
-            config['precision'],
-        )
         if self.strategy == 'radical':
             self.is_passable = lambda signal: signal.color != 'red'
         else:
@@ -38,6 +27,10 @@ class RulesRecognizer:
         signals = self.classifier(image, signals)
 
         return signals, self.recognize(signals)
+    
+    @property
+    def strategy(self):
+        return self.configs['strategy']
 
     def global_recognize(self, signals):
         if self.strategy == 'radical':

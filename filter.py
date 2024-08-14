@@ -8,9 +8,9 @@ from sklearn.cluster import DBSCAN
 
 class SignalFilter:
 
-    def __init__(self, weights, threshold):
-        self.weights = weights
-        self.cluster = DBSCAN(eps=threshold, min_samples=1, metric='precomputed', n_jobs=-1)
+    def __init__(self, configs):
+        self.configs = configs
+        self.cluster = DBSCAN(eps=self.threshold, min_samples=1, metric='precomputed', n_jobs=-1)
 
     def __call__(self, detections):
         clusters = collections.defaultdict(list)
@@ -23,19 +23,23 @@ class SignalFilter:
 
     @property
     def weight_x(self):
-        return self.weights[0]
+        return self.configs['filter']['weights'][0]
 
     @property
     def weight_y(self):
-        return self.weights[1]
+        return self.configs['filter']['weights'][1]
 
     @property
     def weight_w(self):
-        return self.weights[2]
+        return self.configs['filter']['weights'][2]
 
     @property
     def weight_h(self):
-        return self.weights[3]
+        return self.configs['filter']['weights'][3]
+    
+    @property
+    def threshold(self):
+        return self.configs['filter']['threshold']
 
     def rect_difference(self, rect1, rect2):
         difference_x = (rect1.center_x - rect2.center_x) * self.weight_x

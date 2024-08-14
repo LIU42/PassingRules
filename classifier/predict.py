@@ -6,14 +6,14 @@ from utils import ImageUtils
 
 class ShapeClassifier:
 
-    def __init__(self, device, precision):
-        if device == 'GPU':
+    def __init__(self, configs):
+        if configs['device'] == 'GPU':
             providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
         else:
             providers = ['CPUExecutionProvider']
 
-        self.session = ort.InferenceSession(f'classifier/weights/product/classify-{precision}.onnx', providers=providers)
-        self.precision = precision
+        self.configs = configs
+        self.session = ort.InferenceSession(f'classifier/weights/product/classify-{self.precision}.onnx', providers=providers)
 
     def __call__(self, image, signals):
         for signal in signals:
@@ -30,3 +30,7 @@ class ShapeClassifier:
             signal.shape_index = np.argmax(outputs[0].squeeze())
 
         return signals
+    
+    @property
+    def precision(self):
+        return self.configs['precision']
