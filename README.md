@@ -21,7 +21,7 @@
 
 ## 效果展示
 
-<img title="效果图1" src="results/result_1.png" alt="效果图1" style="zoom:67%;">  <img title="效果图2" src="results/result_9.png" alt="效果图2" style="zoom:67%;">
+<img title="效果图1" src="examples/result_1.png" alt="效果图1" style="zoom:67%;">  <img title="效果图2" src="examples/result_9.png" alt="效果图2" style="zoom:67%;">
 
 ## 性能评估
 
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 pip install onnxruntime-gpu
 ```
 
-将所有待识别的图像放入待识别图像目录下（<u>images/</u>），要求图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到项目根目录合并，运行 main.py 即可。
+待识别图像默认在 <u>images/</u> 下 ，识别结果默认保存在 <u>results/</u> 下，如果不存在请先创建。将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到项目中相应的位置，运行 main.py 即可。
 
 ```bash
 python main.py

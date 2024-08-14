@@ -10,7 +10,7 @@ from utils import MarkingUtils
 
 def load_recognizer():
     with open('config.yaml', 'r') as configs:
-        return RulesRecognizer(yaml.load(configs, yaml.SafeLoader))
+        return RulesRecognizer(yaml.safe_load(configs))
 
 
 def load_sources():

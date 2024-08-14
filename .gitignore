@@ -160,8 +160,10 @@ cython_debug/
 .idea
 
 .vscode/
+images/
+results/
+
 */datasets/*
-*/images/*
 */runs/*
 */weights/develop/*
 */weights/product/*
