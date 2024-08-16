@@ -1,5 +1,4 @@
 class TrafficSignal:
-
     def __init__(self, x, y, w, h, color_index, shape_index):
         self.x = x
         self.y = y
@@ -57,7 +56,6 @@ class TrafficSignal:
 
 
 class SignalBuilder:
-
     @staticmethod
     def box(box, color_index):
         x, y, w, h = box
@@ -65,7 +63,6 @@ class SignalBuilder:
 
 
 class PassingDirects:
-
     def __init__(self, left, right, straight):
         self.left = left
         self.right = right
@@ -76,7 +73,6 @@ class PassingDirects:
 
 
 class DirectsBuilder:
-
     @staticmethod
     def allow():
         return PassingDirects(True, True, True)

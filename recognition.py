@@ -1,11 +1,10 @@
-from classifier import ShapeClassifier
 from detector import SignalDetector
 from filter import SignalFilter
+from classifier import ShapeClassifier
 from wrappers import DirectsBuilder
 
 
 class RulesRecognizer:
-
     def __init__(self, configs):
         self.configs = configs
         self.detector = SignalDetector(configs)

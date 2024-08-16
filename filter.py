@@ -7,7 +7,6 @@ from sklearn.cluster import DBSCAN
 
 
 class SignalFilter:
-
     def __init__(self, configs):
         self.configs = configs
         self.cluster = DBSCAN(eps=self.threshold, min_samples=1, metric='precomputed', n_jobs=-1)

@@ -5,7 +5,6 @@ from utils import ImageUtils
 
 
 class ShapeClassifier:
-
     def __init__(self, configs):
         if configs['device'] == 'GPU':
             providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
@@ -24,13 +23,17 @@ class ShapeClassifier:
 
             inputs = ImageUtils.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0, precision=self.precision)
 
-            outputs = self.session.run(None, {
-                'images': inputs,
-            })
-            signal.shape_index = np.argmax(outputs[0].squeeze())
+            outputs = self.session.run([], inputs)
+            outputs = self.postprocess(outputs)
+
+            signal.shape_index = np.argmax(outputs)
 
         return signals
     
     @property
     def precision(self):
         return self.configs['precision']
+
+    @staticmethod
+    def postprocess(outputs):
+        return outputs[0].squeeze()

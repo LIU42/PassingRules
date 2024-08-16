@@ -13,9 +13,9 @@ def load_recognizer():
         return RulesRecognizer(yaml.safe_load(configs))
 
 
-def load_sources():
-    for image_name in os.listdir('images'):
-        yield image_name, cv2.imread(f'images/{image_name}')
+def load_images():
+    for image_name in os.listdir('tests/images'):
+        yield image_name, cv2.imread(f'tests/images/{image_name}')
 
 
 def save_result(image, image_name, results):
@@ -24,7 +24,7 @@ def save_result(image, image_name, results):
     MarkingUtils.signals(image, signals)
     MarkingUtils.directs(image, directs)
 
-    cv2.imwrite(f'results/result_{image_name}', image)
+    cv2.imwrite(f'tests/results/result_{image_name}', image)
 
 
 def execute_recognition(recognizer, image):
@@ -43,7 +43,7 @@ def main():
     recognizer = load_recognizer()
     execution_times = []
 
-    for image_name, image in load_sources():
+    for image_name, image in load_images():
         results, execution_time = execute_recognition(recognizer, image)
 
         execution_times.append(execution_time)
