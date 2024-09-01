@@ -54,10 +54,8 @@ class TrafficSignal:
     def y2(self):
         return self.y + self.h
 
-
-class SignalBuilder:
     @staticmethod
-    def box(box, color_index):
+    def from_box(box, color_index):
         x, y, w, h = box
         return TrafficSignal(x, y - 80, w, h, color_index, None)
 
@@ -71,8 +69,6 @@ class PassingDirects:
     def __str__(self):
         return f'left: {self.left} straight: {self.straight} right: {self.right}'
 
-
-class DirectsBuilder:
     @staticmethod
     def allow():
         return PassingDirects(True, True, True)

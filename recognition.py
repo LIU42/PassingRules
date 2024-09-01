@@ -1,7 +1,7 @@
-from detector import SignalDetector
+from detect import SignalDetector
 from filter import SignalFilter
-from classifier import ShapeClassifier
-from wrappers import DirectsBuilder
+from classify import ShapeClassifier
+from wrappers import PassingDirects
 
 
 class RulesRecognizer:
@@ -20,7 +20,7 @@ class RulesRecognizer:
         detections = self.detector(image)
 
         if len(detections) == 0:
-            return [], DirectsBuilder.allow()
+            return [], PassingDirects.allow()
 
         signals = self.filter(detections)
         signals = self.classifier(image, signals)
@@ -34,14 +34,14 @@ class RulesRecognizer:
     def global_recognize(self, signals):
         if self.strategy == 'radical':
             if any(signal.shape == 'full' and not self.is_passable(signal) for signal in signals):
-                return DirectsBuilder.prohibit()
+                return PassingDirects.prohibit()
             else:
-                return DirectsBuilder.allow()
+                return PassingDirects.allow()
         else:
             if any(signal.shape == 'full' and self.is_passable(signal) for signal in signals):
-                return DirectsBuilder.allow()
+                return PassingDirects.allow()
             else:
-                return DirectsBuilder.prohibit()
+                return PassingDirects.prohibit()
 
     def recognize(self, signals):
         passing_directs = self.global_recognize(signals)

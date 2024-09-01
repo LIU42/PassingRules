@@ -1,7 +1,7 @@
 import numpy as np
 import onnxruntime as ort
 
-from utils import ImageUtils
+import utils.preporcess as preprocess
 
 
 class ShapeClassifier:
@@ -21,10 +21,10 @@ class ShapeClassifier:
             x2 = signal.x2
             y2 = signal.y2
 
-            inputs = ImageUtils.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0, precision=self.precision)
+            inputs = preprocess.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0, precision=self.precision)
 
             outputs = self.session.run([], inputs)
-            outputs = self.postprocess(outputs)
+            outputs = self.postprocessing(outputs)
 
             signal.shape_index = np.argmax(outputs)
 
@@ -35,5 +35,5 @@ class ShapeClassifier:
         return self.configs['precision']
 
     @staticmethod
-    def postprocess(outputs):
+    def postprocessing(outputs):
         return outputs[0].squeeze()

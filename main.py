@@ -3,9 +3,9 @@ import os
 import statistics
 import time
 import yaml
+import utils.paint as paint
 
 from recognition import RulesRecognizer
-from utils import MarkingUtils
 
 
 def load_recognizer():
@@ -21,8 +21,8 @@ def load_images():
 def save_result(image, image_name, results):
     signals, directs = results
 
-    MarkingUtils.signals(image, signals)
-    MarkingUtils.directs(image, directs)
+    paint.signals(image, signals)
+    paint.directs(image, directs)
 
     cv2.imwrite(f'tests/results/result_{image_name}', image)
 
