@@ -57,7 +57,7 @@ pip install onnxruntime-gpu
 python main.py
 ```
 
-本项目识别程序的默认配置文件为 config.yaml，其中各个属性对应的含义如下：
+本项目识别程序的默认配置文件为 <u>configs/config.yaml</u>，其中各个属性对应的含义如下：
 
 ```yaml
 device: "CPU"        # 推理设备，"CPU"" 或 "GPU""

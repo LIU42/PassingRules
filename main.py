@@ -9,7 +9,7 @@ from recognition import RulesRecognizer
 
 
 def load_recognizer():
-    with open('config.yaml', 'r') as configs:
+    with open('configs/config.yaml', 'r') as configs:
         return RulesRecognizer(yaml.safe_load(configs))
 
 

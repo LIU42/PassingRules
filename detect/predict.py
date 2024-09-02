@@ -1,7 +1,5 @@
 import onnxruntime as ort
-
-import utils.preporcess as preprocess
-import utils.postprocess as postprocess
+import utils.porcess as process
 
 from wrappers import TrafficSignal
 
@@ -17,12 +15,12 @@ class SignalDetector:
         self.session = ort.InferenceSession(f'detect/weights/product/detect-{self.precision}.onnx', providers=providers)
 
     def __call__(self, image):
-        inputs = preprocess.preprocess(image, size=640, padding_color=127, precision=self.precision)
+        inputs = process.preprocess(image, size=640, padding_color=127, precision=self.precision)
 
         outputs = self.session.run([], inputs)
-        outputs = self.postprocessing(outputs)
+        outputs = self.reshape(outputs)
         
-        results = postprocess.non_max_suppression(outputs, self.conf_threshold, self.iou_threshold)
+        results = process.non_max_suppression(outputs, self.conf_threshold, self.iou_threshold)
 
         return [TrafficSignal.from_box(box, color_index) for box, color_index in results]
     
@@ -32,13 +30,13 @@ class SignalDetector:
     
     @property
     def conf_threshold(self):
-        return self.configs['detect']['conf-threshold']
+        return self.configs['detector']['conf-threshold']
 
     @property
     def iou_threshold(self):
-        return self.configs['detect']['iou-threshold']
+        return self.configs['detector']['iou-threshold']
 
     @staticmethod
-    def postprocessing(outputs):
+    def reshape(outputs):
         return outputs[0].squeeze().transpose()
     
