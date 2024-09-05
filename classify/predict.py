@@ -7,12 +7,12 @@ import utils.porcess as process
 class ShapeClassifier:
     def __init__(self, configs):
         if configs['device'] == 'GPU':
-            providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+            providers = ['CUDAExecutionProvider']
         else:
             providers = ['CPUExecutionProvider']
 
         self.configs = configs
-        self.session = ort.InferenceSession(f'classify/weights/product/classify-{self.precision}.onnx', providers=providers)
+        self.session = ort.InferenceSession(f'classify/weights/deploy/classify-{self.precision}.onnx', providers=providers)
 
     def __call__(self, image, signals):
         for signal in signals:
@@ -23,7 +23,7 @@ class ShapeClassifier:
 
             inputs = process.preprocess(image[y1:y2, x1:x2], size=64, padding_color=0, precision=self.precision)
 
-            outputs = self.session.run([], inputs)
+            outputs = self.session.run(None, inputs)
             outputs = self.reshape(outputs)
 
             signal.shape_index = np.argmax(outputs)

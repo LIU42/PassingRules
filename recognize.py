@@ -1,7 +1,7 @@
+from classify import ShapeClassifier
+from data import PassingDirects
 from detect import SignalDetector
 from filter import SignalFilter
-from classify import ShapeClassifier
-from wrappers import PassingDirects
 
 
 class RulesRecognizer:

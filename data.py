@@ -55,8 +55,8 @@ class TrafficSignal:
         return self.y + self.h
 
     @staticmethod
-    def from_box(box, color_index):
-        x, y, w, h = box
+    def from_bbox(bbox, color_index):
+        x, y, w, h = bbox
         return TrafficSignal(x, y - 80, w, h, color_index, None)
 
 

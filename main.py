@@ -5,7 +5,7 @@ import time
 import yaml
 import utils.paint as paint
 
-from recognition import RulesRecognizer
+from recognize import RulesRecognizer
 
 
 def load_recognizer():
@@ -14,8 +14,8 @@ def load_recognizer():
 
 
 def load_images():
-    for image_name in os.listdir('tests/images'):
-        yield image_name, cv2.imread(f'tests/images/{image_name}')
+    for image_name in os.listdir('examples/sources'):
+        yield image_name, cv2.imread(f'examples/sources/{image_name}')
 
 
 def save_result(image, image_name, results):
@@ -24,7 +24,7 @@ def save_result(image, image_name, results):
     paint.signals(image, signals)
     paint.directs(image, directs)
 
-    cv2.imwrite(f'tests/results/result_{image_name}', image)
+    cv2.imwrite(f'examples/outputs/result_{image_name}', image)
 
 
 def execute_recognition(recognizer, image):

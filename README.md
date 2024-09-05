@@ -21,7 +21,7 @@
 
 ## 效果展示
 
-<img title="效果图1" src="examples/result_1.png" alt="效果图1" style="zoom:67%;">  <img title="效果图2" src="examples/result_9.png" alt="效果图2" style="zoom:67%;">
+<img title="效果图1" src="examples/displays/result_1.png" alt="效果图1" style="zoom:67%;">  <img title="效果图2" src="examples/displays/result_9.png" alt="效果图2" style="zoom:67%;">
 
 ## 性能评估
 
@@ -39,7 +39,7 @@
 
 ## 使用说明
 
-首先安装环境依赖包，项目目前采用 ONNX Runtime 部署模型。
+首先安装环境依赖包，项目目前采用 ONNX Runtime 部署模型推理。
 
 ```bash
 pip install -r requirements.txt
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 pip install onnxruntime-gpu
 ```
 
-待识别图像默认在 <u>tests/images/</u> 下 ，识别结果默认保存在 <u>tests/results/</u> 下，如果不存在请先创建。将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到项目中相应的位置，运行 main.py 即可。
+待识别图像默认在 <u>examples/sources/</u> 下 ，识别结果默认保存在 <u>examples/outputs/</u> 下，如果不存在请先创建。将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，可以在本项目 Releases 中下载我训练好的模型权重文件，解压到项目中相应的位置（位于 <u>detect/weights/deploy/</u> 和 <u>classify/weights/deploy/</u>），运行 main.py 即可。
 
 ```bash
 python main.py
@@ -60,7 +60,7 @@ python main.py
 本项目识别程序的默认配置文件为 <u>configs/config.yaml</u>，其中各个属性对应的含义如下：
 
 ```yaml
-device: "CPU"        # 推理设备，"CPU"" 或 "GPU""
+device: "CPU"        # 推理设备，"CPU" 或 "CUDA"
 precision: "fp32"    # 推理运算精度，"fp32"（单精度）或 "fp16"（半精度）
 
 detector:
