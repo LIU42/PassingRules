@@ -6,7 +6,7 @@ import utils.porcess as process
 
 class ShapeClassifier:
     def __init__(self, configs):
-        if configs['device'] == 'GPU':
+        if configs['device'] == 'CUDA':
             providers = ['CUDAExecutionProvider']
         else:
             providers = ['CPUExecutionProvider']
