@@ -51,7 +51,7 @@ pip install -r requirements.txt
 pip install onnxruntime-gpu
 ```
 
-待识别图像默认在 <u>examples/sources/</u> 下 ，识别结果默认保存在 <u>examples/outputs/</u> 下，如果不存在请先创建。将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，可以在本项目 Releases 中下载我训练好的模型权重文件，解压到项目中相应的位置（位于 <u>detect/weights/deploy/</u> 和 <u>classify/weights/deploy/</u>），运行 main.py 即可。
+待识别图像默认在 <u>examples/sources/</u> 下 ，识别结果默认保存在 <u>examples/outputs/</u> 下，如果不存在请先创建。将所有待识别的图像放入待识别图像目录下，要求图像尺寸为 640x480，可以在本项目 Releases 中下载我训练好的模型权重文件，解压到项目中相应的位置（位于 <u>detect/weights/</u> 和 <u>classify/weights/</u>），运行 main.py 即可。
 
 ```bash
 python main.py
@@ -79,3 +79,5 @@ strategy: "conservative"    # 通行规则识别策略，“conservative”（�
 ```bash
 pip install ultralytics
 ```
+
+

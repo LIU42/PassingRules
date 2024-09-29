@@ -165,5 +165,5 @@ examples/outputs/*
 
 */datasets/*
 */runs/*
-*/weights/develop/*
-*/weights/deploy/*
+*/weights/*
+*/checkpoints/*
