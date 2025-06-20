@@ -16,15 +16,17 @@ classes_labels = [
 session = ort.InferenceSession(configs['model-path'], providers=configs['providers'])
 
 
-def preprocess(image):
-    inputs = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).transpose((2, 0, 1))
-    inputs = inputs / 255.0
-    inputs = np.expand_dims(inputs, axis=0)
+def normalize(inputs):
+    return inputs / 255.0
+
+
+def convert_inputs(image):
+    converted = normalize(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)).transpose((2, 0, 1))
 
     if configs['precision'] == 'fp16':
-        return inputs.astype(np.float16)
+        return np.expand_dims(converted, axis=0).astype(np.float16)
     else:
-        return inputs.astype(np.float32)
+        return np.expand_dims(converted, axis=0).astype(np.float32)
 
 
 def get_valid_outputs(outputs):
@@ -33,7 +35,7 @@ def get_valid_outputs(outputs):
     bboxes = valid_outputs[:, 0:4]
     scores = valid_outputs[:, 4:12]
 
-    return bboxes.astype(np.int32), np.amax(scores, axis=1), np.argmax(scores, axis=1)
+    return bboxes.astype(np.int32), np.max(scores, axis=1), np.argmax(scores, axis=1)
 
 
 def non_max_suppression(outputs):
@@ -53,26 +55,26 @@ def non_max_suppression(outputs):
 
 
 def detection_inference(image):
-    outputs = session.run(['output0'], {'images': preprocess(image)})
-    outputs = outputs[0]
-    outputs = outputs.squeeze().transpose()
+    detections = session.run(['output0'], {'images': convert_inputs(image)})
+    detections = detections[0]
+    detections = detections.squeeze().transpose()
 
-    return [detection for detection in non_max_suppression(outputs)]
+    return [detection for detection in non_max_suppression(detections)]
 
 
 def inference(image):
-    detections = detection_inference(image)
+    detection_outputs = detection_inference(image)
 
     result0 = False
     result1 = False
     result2 = True
 
-    for _, label in detections:
+    for _, label in detection_outputs:
         if label == 'F1':
             result0 = True
             result1 = True
 
-    for _, label in detections:
+    for _, label in detection_outputs:
         if label == 'L0':
             result0 = False
         if label == 'L1':
@@ -86,4 +88,4 @@ def inference(image):
         if label == 'R1':
             result2 = True
 
-    return (result0, result1, result2), detections
+    return (result0, result1, result2), detection_outputs
