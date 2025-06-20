@@ -1,8 +1,8 @@
 import cv2
 
 
-def draw_bound(image, detection):
-    detection_bbox, detection_label = detection
+def draw_bound(image, detection_result):
+    detection_bbox, detection_label = detection_result
 
     x1 = detection_bbox[0]
     y1 = detection_bbox[1]
@@ -15,8 +15,8 @@ def draw_bound(image, detection):
         return cv2.rectangle(image, (x1, y1), (x2, y2), (0, 215, 0), thickness=2)
 
 
-def draw_label(image, detection):
-    detection_bbox, detection_label = detection
+def draw_label(image, detection_result):
+    detection_bbox, detection_label = detection_result
 
     x1 = detection_bbox[0]
     y1 = detection_bbox[1]

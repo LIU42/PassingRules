@@ -20,13 +20,15 @@ def normalize(inputs):
     return inputs / 255.0
 
 
-def convert_inputs(image):
-    converted = normalize(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)).transpose((2, 0, 1))
+def preprocess(image):
+    inputs = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).transpose((2, 0, 1))
 
     if configs['precision'] == 'fp16':
-        return np.expand_dims(converted, axis=0).astype(np.float16)
+        inputs = normalize(inputs).astype(np.float16)
     else:
-        return np.expand_dims(converted, axis=0).astype(np.float32)
+        inputs = normalize(inputs).astype(np.float32)
+
+    return np.expand_dims(inputs, axis=0)
 
 
 def get_valid_outputs(outputs):
@@ -48,14 +50,14 @@ def non_max_suppression(outputs):
         x1 = bboxes[index, 0]
         y1 = bboxes[index, 1]
 
-        x2 = bboxes[index, 2] + bboxes[index, 0]
-        y2 = bboxes[index, 3] + bboxes[index, 1]
+        x2 = bboxes[index, 2] + x1
+        y2 = bboxes[index, 3] + y1
 
         yield (x1, y1, x2, y2), classes_labels[classes[index]]
 
 
 def detection_inference(image):
-    detections = session.run(['output0'], {'images': convert_inputs(image)})
+    detections = session.run(['output0'], {'images': preprocess(image)})
     detections = detections[0]
     detections = detections.squeeze().transpose()
 
