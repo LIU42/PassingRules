@@ -1,4 +1,4 @@
-# Traffic Rules
+# TrafficRules 通行规则识别
 
 *<u>v2.0.0 新变化：使用 YOLO11 以及一个更加丰富的数据集训练模型，对原来目标检测和信号分类两个步骤进行整合，去除了在大部分情况下冗余的过滤筛选，实现交通信号灯识别一步到位，得到的模型识别准确率和推理效率均有少量的提升，且更加易于部署。</u>*
 
@@ -18,7 +18,7 @@
 
 ## 效果展示
 
-![](assets/example.jpg)
+![](./assets/screenshots.jpg)
 
 ## 性能评估
 
@@ -46,7 +46,7 @@
 pip install -r requirements.txt
 ```
 
-准备好待识别图像，识别程序接受的图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到 inferences/models 目录下，运行主程序 main.py 即可，其命令行参数的含义如下，其中输入图像文件路图像文件路径数量保持一致：
+准备好待识别图像，识别程序接受的图像尺寸为 640x480，在本项目 Releases 中下载我训练好的模型权重文件，解压到 inferences/models 目录下，运行程序 runs/main.py 即可，其命令行参数的含义如下，其中输入图像文件路图像文件路径数量保持一致：
 
 | 参数名       | 简化参数名 | 参数描述                       |
 |:---------:|:-----:|:--------------------------:|
@@ -56,10 +56,10 @@ pip install -r requirements.txt
 下面是一个运行示例。
 
 ```shell-session
-python main.py --sources "1.jpg" "2.jpg" --outputs "1.jpg" "2.jpg"
+python runs/main.py --sources "s1.jpg" "s2.jpg" --outputs "o1.jpg" "o2.jpg"
 ```
 
-本项目的识别程序被设计为一个即插即用的 Python 模块，可以将 inferences 模块完整拷贝到其他项目根目录下，配置好环境并安装好相关的依赖，参考 main.py 中的调用方式。
+本项目的识别程序被设计为一个即插即用的 Python 模块，可以将 inferences 模块完整拷贝到其他项目根目录下，配置好环境并安装好相关的依赖，参考 runs/main.py 中的调用方式。
 
 通行规则识别模块默认的配置文件为 inferences/configs/config.toml，其中各个属性描述如下：
 
@@ -76,5 +76,3 @@ python main.py --sources "1.jpg" "2.jpg" --outputs "1.jpg" "2.jpg"
 ```shell-session
 pip install ultralytics
 ```
-
-
